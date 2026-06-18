@@ -12,6 +12,11 @@
   --ifm-color-primary-light: #2563eb;
   --ifm-color-primary-lighter: #3b82f6;
   --ifm-color-primary-lightest: #60a5fa;
+  --ifm-search-button-background: #dbeafe;
+  --ifm-search-button-background-hover: #bfdbfe;
+  --ifm-search-button-border-color: #93c5fd;
+  --ifm-search-button-border-color-hover: #60a5fa;
+  --ifm-search-button-text-color: #1d4ed8;
   --ifm-font-family-base: 'Google Sans', 'Segoe UI', Arial, sans-serif;
   --ifm-font-family-monospace: 'Google Sans Code', 'Consolas', 'Courier New', monospace;
   --ifm-code-font-size: 0.8rem;
@@ -100,4 +105,33 @@ pre,
   --ifm-color-primary-light: #93c5fd;
   --ifm-color-primary-lighter: #bfdbfe;
   --ifm-color-primary-lightest: #dbeafe;
+  --ifm-search-button-background: #dbeafe;
+  --ifm-search-button-background-hover: #bfdbfe;
+  --ifm-search-button-border-color: #93c5fd;
+  --ifm-search-button-border-color-hover: #60a5fa;
+  --ifm-search-button-text-color: #1d4ed8;
+}
+
+.DocSearch-Button {
+  background: var(--ifm-search-button-background);
+  border: 1px solid var(--ifm-search-button-border-color);
+  color: var(--ifm-search-button-text-color);
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.DocSearch-Button:hover,
+.DocSearch-Button:focus {
+  background: var(--ifm-search-button-background-hover);
+  border-color: var(--ifm-search-button-border-color-hover);
+  color: var(--ifm-search-button-text-color);
+  box-shadow: none;
+}
+
+.DocSearch-Button .DocSearch-Search-Icon {
+  color: var(--ifm-search-button-text-color);
+}
+
+.DocSearch-Button-Keys {
+  border-color: color-mix(in srgb, var(--ifm-search-button-border-color) 70%, transparent);
 }

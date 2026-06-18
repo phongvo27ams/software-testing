@@ -47,6 +47,17 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+  plugins: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        indexDocs: true,
+        language: 'en',
+        searchBarPosition: 'right',
+      },
+    ],
+  ],
   themeConfig: {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
@@ -70,6 +81,10 @@ const config: Config = {
           sidebarId: 'testAutomationSidebar',
           position: 'left',
           label: 'Test Automation',
+        },
+        {
+          type: 'search',
+          position: 'right',
         },
         {
           href: 'https://github.com/phongvo27ams/software-testing',
