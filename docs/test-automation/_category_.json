@@ -1,0 +1,8 @@
+{
+  "label": "Test Automation",
+  "position": 2,
+  "link": {
+    "type": "doc",
+    "id": "test-automation/index"
+  }
+}

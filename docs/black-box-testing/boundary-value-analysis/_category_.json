@@ -1,0 +1,8 @@
+{
+  "label": "Boundary Value Analysis",
+  "position": 1,
+  "link": {
+    "type": "doc",
+    "id": "black-box-testing/boundary-value-analysis/index"
+  }
+}

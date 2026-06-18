@@ -1,0 +1,103 @@
+@import url('katex/dist/katex.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Code:wght@400;500;700&display=swap');
+
+/**
+ * Global theme overrides for the docs site.
+ */
+:root {
+  --ifm-color-primary: #1d4ed8;
+  --ifm-color-primary-dark: #1e40af;
+  --ifm-color-primary-darker: #1e3a8a;
+  --ifm-color-primary-darkest: #172554;
+  --ifm-color-primary-light: #2563eb;
+  --ifm-color-primary-lighter: #3b82f6;
+  --ifm-color-primary-lightest: #60a5fa;
+  --ifm-font-family-base: 'Google Sans', 'Segoe UI', Arial, sans-serif;
+  --ifm-font-family-monospace: 'Google Sans Code', 'Consolas', 'Courier New', monospace;
+  --ifm-code-font-size: 0.8rem;
+  --ifm-code-border-radius: 6px;
+  --ifm-code-border-width: 0.8px;
+  --ifm-inline-code-border-radius: 6px;
+  --ifm-inline-code-border-width: 0px;
+  --ifm-inline-code-background: #448aff1a;
+}
+
+html {
+  font-size: 18px;
+}
+
+html,
+body {
+  font-family: var(--ifm-font-family-base);
+}
+
+body {
+  font-size: 1rem;
+}
+
+code,
+kbd,
+samp,
+pre,
+.prism-code {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+/* Inline code only; avoid matching Prism code blocks */
+:not(pre) > code:not(.prism-code) {
+  border-radius: var(--ifm-inline-code-border-radius);
+  border: var(--ifm-inline-code-border-width) solid transparent;
+  background: var(--ifm-inline-code-background);
+  padding: 0.1rem 0.35rem;
+}
+
+.theme-code-block,
+.codeBlockContainer_Ckt0 {
+  border: var(--ifm-code-border-width) solid
+    var(--ifm-color-primary-dark);
+  border-radius: var(--ifm-code-border-radius);
+  background: var(--ifm-color-white);
+  overflow: hidden;
+}
+
+.theme-code-block pre,
+.codeBlockContainer_Ckt0 pre {
+  background: var(--ifm-color-white) !important;
+  margin: 0;
+}
+
+.theme-code-block code,
+.codeBlockContainer_Ckt0 code,
+.theme-code-block .prism-code,
+.codeBlockContainer_Ckt0 .prism-code {
+  background: var(--ifm-color-white) !important;
+}
+
+.theme-code-block .buttonGroup_M5ko button,
+.codeBlockContainer_Ckt0 .buttonGroup_M5ko button {
+  color: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+}
+
+.theme-code-block .buttonGroup_M5ko button:hover,
+.theme-code-block .buttonGroup_M5ko button:focus-visible,
+.codeBlockContainer_Ckt0 .buttonGroup_M5ko button:hover,
+.codeBlockContainer_Ckt0 .buttonGroup_M5ko button:focus-visible {
+  color: var(--ifm-color-primary-darker);
+  border-color: var(--ifm-color-primary-darker);
+}
+
+.theme-code-block .copyButtonSuccessIcon_cVMy,
+.codeBlockContainer_Ckt0 .copyButtonSuccessIcon_cVMy {
+  color: var(--ifm-color-primary-dark);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #60a5fa;
+  --ifm-color-primary-dark: #3b82f6;
+  --ifm-color-primary-darker: #2563eb;
+  --ifm-color-primary-darkest: #1d4ed8;
+  --ifm-color-primary-light: #93c5fd;
+  --ifm-color-primary-lighter: #bfdbfe;
+  --ifm-color-primary-lightest: #dbeafe;
+}
