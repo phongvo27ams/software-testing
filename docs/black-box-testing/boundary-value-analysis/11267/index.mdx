@@ -30,6 +30,21 @@ For each method:
 - Identify the test values selected for each variable.
 - Present the test cases in table form.
 
+## Activity Diagram
+
+```mermaid
+flowchart TD
+    A([Start]) --> B[Enter Duration and Number of Students]
+    B --> C{Duration within 30..180?}
+    C -- No --> D[Reject booking and show Duration error]
+    C -- Yes --> E{Number of Students within 1..50?}
+    E -- No --> F[Reject booking and show Student error]
+    E -- Yes --> G[Accept booking]
+    D --> H([End])
+    F --> H
+    G --> H
+```
+
 <HintCallout title="Approach guide">
 
 Start by listing the valid range and nominal value of each input variable.

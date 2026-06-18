@@ -1,4 +1,4 @@
-# Software Testing Exercises
+# Software Testing
 
 This repository contains a Docusaurus site for software testing study materials. It is structured as a collection of exercises, sample answers, and topic pages for test design techniques such as:
 

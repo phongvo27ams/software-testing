@@ -11,6 +11,9 @@ const config: Config = {
   future: {
     v4: true,
   },
+  markdown: {
+    mermaid: true,
+  },
   url: 'https://phongvo27ams.github.io',
   baseUrl: isProd ? '/software-testing/' : '/',
   organizationName: 'phongvo27ams',
@@ -58,6 +61,7 @@ const config: Config = {
       },
     ],
   ],
+  themes: [require.resolve('@docusaurus/theme-mermaid')],
   themeConfig: {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
