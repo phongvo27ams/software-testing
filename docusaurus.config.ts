@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const isProd = process.env.NODE_ENV === 'production';
 
 const config: Config = {
-  title: 'Software Testing Exercises',
+  title: 'Software Testing',
   tagline: 'Practice notes and sample answers for software testing',
   favicon: 'img/favicon.ico',
   future: {
