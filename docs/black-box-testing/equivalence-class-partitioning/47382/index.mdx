@@ -6,35 +6,22 @@ A movie ticket booking system allows customers to reserve tickets by entering tw
 
 | Data field | Description | Valid values |
 |---|---|---|
-| `Age` | The age of the customer | From `6` to `80` |
+| `Age` | The age of the customer | `Child`, `Adult`, `Senior` |
 | `Seat type` | The type of seat selected by the customer | `S`, `P` |
 
 The system must validate the inputs according to the following rules:
 
-- Customers aged from `6` to `12` are classified as `Child`.
-- Customers aged from `13` to `59` are classified as `Adult`.
-- Customers aged from `60` to `80` are classified as `Senior`.
-- Any age less than `6` is invalid.
-- Any age greater than `80` is invalid.
-- `Standard` seats are entered as `S`.
-- `Premium` seats are entered as `P`.
-- If no seat type is selected, the system must display an error message.
-- If the user enters any value other than `S` or `P`, the system must display an error message.
+- Age group:
+  - Customers aged from `6` to `12` are classified as `Child`.
+  - Customers aged from `13` to `59` are classified as `Adult`.
+  - Customers aged from `60` to `80` are classified as `Senior`.
+  - Any age less than `6` is invalid, or greater than `80` is invalid.
+- Seat type:
+  - `Standard` seats are entered as `S`.
+  - `Premium` seats are entered as `P`.
+  - If no seat type is selected, the system must display an error message.
+  - If the user enters any value other than `S` or `P`, the system must display an error message.
 - The booking is accepted only when both `Age` and `Seat type` are valid.
-
-Assume the following representative values for testing:
-
-| Equivalence class | Representative value |
-|---|---|
-| Valid Child age | `8` |
-| Valid Adult age | `25` |
-| Valid Senior age | `65` |
-| Invalid low age | `5` |
-| Invalid high age | `81` |
-| Standard seat | `S` |
-| Premium seat | `P` |
-| Missing seat type | `Blank` |
-| Invalid seat type | `X` |
 
 ## Question
 
@@ -62,14 +49,19 @@ A practical way to solve the question is to list the classes first, then decide 
 
 ## Sample Answer
 
-To design ECP test sets, we first identify the equivalence classes for each input variable.
+To design ECP test sets, we first identify the equivalence classes for each input variable:
 
-There are 2 input variables:
-
-| Variable | Valid classes | Invalid classes |
-|---|---|---|
-| `Age group` | Child, Adult, Senior | Under 6, Over 80 |
-| `Seat type` | S, P | Blank, X |
+| Variable | Equivalence classe | Value | Type |
+|---|---|---|---|
+| Age group | EC1 | 6-12 | Valid: `Child` |
+| Age group | EC2 | 13-59 | Valid: `Adult` |
+| Age group | EC3 | 60-80 | Valid: `Senior` |
+| Age group | EC4 | < 6 | Invalid |
+| Age group | EC5 | > 80 | Invalid |
+| Seat type | EC6 | S | Valid: `Standard` |
+| Seat type | EC7 | P | Valid: `Premium` |
+| Seat type | EC8 | Blank | Invalid |
+| Seat type | EC9 | X | Invalid |
 
 The system accepts the booking only when both inputs belong to valid equivalence classes.
 
@@ -77,21 +69,13 @@ The system accepts the booking only when both inputs belong to valid equivalence
 
 Weak means we do not need to test every combination. Normal means we use only valid classes.
 
-We need to cover all valid classes at least once:
-
-- `Child`
-- `Adult`
-- `Senior`
-- `S`
-- `P`
-
-One suitable test set is:
+We need to cover all valid classes at least once: EC1, EC2, EC3, EC6, EC7. One suitable test set is:
 
 | Test case | Age group | Seat type | Covered classes |
 |---|---:|---:|---|
-| TC-001 | 8 | S | Child, Standard |
-| TC-002 | 25 | P | Adult, Premium |
-| TC-003 | 65 | S | Senior, Standard |
+| TC-001 | 8 | S | EC1, EC6 |
+| TC-002 | 25 | P | EC2, EC7 |
+| TC-003 | 65 | S | EC3, EC6 |
 
 Weak Normal ECP requires 3 test cases in this example.
 
@@ -99,24 +83,17 @@ Weak Normal ECP requires 3 test cases in this example.
 
 Weak means we do not need to test every combination. Robust means we include both valid and invalid classes.
 
-We need to cover all classes at least once:
+We need to cover all classes at least once. One suitable test set is:
 
-- Valid age classes: Child, Adult, Senior
-- Invalid age classes: Under 6, Over 80
-- Valid seat classes: S, P
-- Invalid seat classes: Blank, X
-
-One suitable test set is:
-
-| Test case | Age group | Seat type | Expected result |
+| Test case | Age group | Seat type | Covered classes |
 |---|---:|---:|---|
-| TC-001 | 8 | S | Valid: Child, Standard |
-| TC-002 | 25 | P | Valid: Adult, Premium |
-| TC-003 | 65 | S | Valid: Senior, Standard |
-| TC-004 | 5 | S | Invalid: Under 6, Standard |
-| TC-005 | 81 | P | Invalid: Over 80, Premium |
-| TC-006 | 25 | Blank | Invalid: Adult, Missing seat type |
-| TC-007 | 25 | X | Invalid: Adult, Invalid seat type |
+| TC-001 | 8 | S | EC1, EC6 |
+| TC-002 | 25 | P | EC2, EC7 |
+| TC-003 | 65 | S | EC3, EC6 |
+| TC-004 | 5 | S | EC4, EC6 |
+| TC-005 | 81 | P | EC5, EC7 |
+| TC-006 | 25 | Blank | EC2, EC8 |
+| TC-007 | 25 | X | EC2, EC9 |
 
 Weak Robust ECP requires 7 test cases in this example.
 
