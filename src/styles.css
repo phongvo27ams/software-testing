@@ -568,3 +568,60 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+.media-library {
+  margin-top: var(--space-5);
+}
+
+.media-list {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.media-item {
+  display: grid;
+  grid-template-columns: minmax(180px, 320px) 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-box);
+  background: white;
+  align-items: start;
+}
+
+.media-preview {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-box);
+  border: 1px solid var(--line);
+}
+
+.media-audio {
+  width: 100%;
+  max-width: 100%;
+  align-self: center;
+}
+
+.media-meta {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.media-url {
+  display: block;
+  white-space: normal;
+  word-break: break-all;
+}
+
+@media (max-width: 720px) {
+  .media-item {
+    grid-template-columns: 1fr;
+  }
+
+  .media-preview {
+    height: 160px;
+  }
+}

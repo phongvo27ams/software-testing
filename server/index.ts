@@ -1,10 +1,97 @@
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { prisma } from './db';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const publicDir = path.join(rootDir, 'public');
+const mediaDir = path.join(publicDir, 'media');
+const imagesDir = path.join(mediaDir, 'images');
+const audioDir = path.join(mediaDir, 'audio');
+const allowedMimeTypes = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'audio/mpeg', 'audio/wav', 'audio/ogg']);
+
+await Promise.all([fs.mkdir(imagesDir, { recursive: true }), fs.mkdir(audioDir, { recursive: true })]);
+
+const storage = multer.diskStorage({
+  destination: (_req, file, cb) => {
+    const destination = file.mimetype.startsWith('audio/') ? audioDir : imagesDir;
+    cb(null, destination);
+  },
+  filename: (_req, file, cb) => {
+    const safeBase = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, '-');
+    cb(null, `${Date.now()}-${safeBase}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (_req, file, cb) => {
+    if (!allowedMimeTypes.has(file.mimetype)) {
+      cb(new Error('Unsupported file type.'));
+      return;
+    }
+    cb(null, true);
+  },
+});
+
+app.use('/media', express.static(mediaDir));
+
+app.get('/api/media', async (_req, res) => {
+  const [imageFiles, audioFiles] = await Promise.all([
+    fs.readdir(imagesDir, { withFileTypes: true }),
+    fs.readdir(audioDir, { withFileTypes: true }),
+  ]);
+
+  res.json([
+    ...imageFiles
+      .filter((file) => file.isFile())
+      .map((file) => ({
+        name: file.name,
+        url: `/media/images/${file.name}`,
+        type: 'image',
+      })),
+    ...audioFiles
+      .filter((file) => file.isFile())
+      .map((file) => ({
+        name: file.name,
+        url: `/media/audio/${file.name}`,
+        type: 'audio',
+      })),
+  ]);
+});
+
+app.post('/api/media', upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
+  const type = req.file.mimetype.startsWith('audio/') ? 'audio' : 'image';
+  const folder = type === 'audio' ? 'audio' : 'images';
+  res.status(201).json({
+    name: req.file.filename,
+    url: `/media/${folder}/${req.file.filename}`,
+    type,
+    mimeType: req.file.mimetype,
+  });
+});
+
+app.delete('/api/media/:name', async (req, res) => {
+  const fileName = path.basename(req.params.name);
+  const candidatePaths = [path.join(imagesDir, fileName), path.join(audioDir, fileName)];
+  for (const filePath of candidatePaths) {
+    try {
+      await fs.unlink(filePath);
+      return res.status(204).send();
+    } catch {
+      continue;
+    }
+  }
+  return res.status(404).json({ message: 'File not found.' });
+});
 
 app.get('/api/exercises', async (_req, res) => {
   const exercises = await prisma.exercise.findMany({

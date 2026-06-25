@@ -19,6 +19,12 @@ type DraftQuestion = {
   options: { label: string; text: string }[];
 };
 
+type MediaItem = {
+  name: string;
+  url: string;
+  type?: 'image' | 'audio';
+};
+
 async function loadSectionsData() {
   try {
     return await apiGet<Section[]>('/api/sections');
@@ -78,6 +84,28 @@ function shuffleArray<T>(items: T[]) {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+async function uploadMedia(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch('/api/media', {
+    method: 'POST',
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error('Upload failed.');
+  }
+  return response.json() as Promise<MediaItem & { mimeType: string }>;
+}
+
+async function deleteMedia(name: string) {
+  const response = await fetch(`/api/media/${encodeURIComponent(name)}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok && response.status !== 204) {
+    throw new Error('Delete failed.');
+  }
 }
 
 function App() {
@@ -293,13 +321,13 @@ function ExercisePage({
   const [answers, setAnswers] = useState<AnswerState>({});
   const [optionOrder, setOptionOrder] = useState<OptionOrderState>({});
   const [submitted, setSubmitted] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingExercise, setIsEditingExercise] = useState(false);
   const [editSectionTitle, setEditSectionTitle] = useState(exercise.sectionTitle);
   const [editTitle, setEditTitle] = useState(exercise.title);
   const [editDescription, setEditDescription] = useState(exercise.description);
-  const [editQuestions, setEditQuestions] = useState<DraftQuestion[]>(() => exerciseToDraftQuestions(exercise));
-  const [saving, setSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState('');
+  const [savingExercise, setSavingExercise] = useState(false);
+  const [exerciseSaveMessage, setExerciseSaveMessage] = useState('');
+  const [questionEditId, setQuestionEditId] = useState<string | null>(null);
 
   useEffect(() => {
     const nextOrder = Object.fromEntries(
@@ -312,13 +340,13 @@ function ExercisePage({
     setAnswers({});
     setSubmitted(false);
     setOptionOrder(nextOrder);
-    setIsEditing(false);
+    setIsEditingExercise(false);
     setEditSectionTitle(exercise.sectionTitle);
     setEditTitle(exercise.title);
     setEditDescription(exercise.description);
-    setEditQuestions(exerciseToDraftQuestions(exercise));
-    setSaveMessage('');
-  }, [exercise.id]);
+    setQuestionEditId(null);
+    setExerciseSaveMessage('');
+  }, [exercise.id, exercise.questions]);
 
   const correctCount = exercise.questions.reduce((count, question) => {
     return count + (answers[question.id] === question.correctOptionId ? 1 : 0);
@@ -348,11 +376,11 @@ function ExercisePage({
           <button
             className="ghost"
             onClick={() => {
-              setIsEditing((current) => !current);
-              setSaveMessage('');
+              setIsEditingExercise((current) => !current);
+              setExerciseSaveMessage('');
             }}
           >
-            {isEditing ? 'Cancel edit' : 'Edit'}
+            {isEditingExercise ? 'Cancel edit' : 'Edit Exercise'}
           </button>
           <button
             className="ghost"
@@ -367,33 +395,21 @@ function ExercisePage({
         </div>
       </div>
 
-      {isEditing ? (
-        <ExerciseEditor
+      {isEditingExercise ? (
+        <ExerciseMetaEditor
           sections={sections}
           sectionTitle={editSectionTitle}
           title={editTitle}
           description={editDescription}
-          questions={editQuestions}
           onChangeSectionTitle={setEditSectionTitle}
           onChangeTitle={setEditTitle}
           onChangeDescription={setEditDescription}
-          onChangeQuestions={setEditQuestions}
-          onAddQuestion={() => setEditQuestions((current) => [...current, createEmptyDraftQuestion()])}
-          onRemoveQuestion={(questionIndex) =>
-            setEditQuestions((current) => current.filter((_, index) => index !== questionIndex))
-          }
           onSave={async () => {
-            setSaving(true);
-            setSaveMessage('');
+            setSavingExercise(true);
+            setExerciseSaveMessage('');
             try {
-              const cleanQuestions = editQuestions.filter(
-                (question) =>
-                  question.prompt.trim() &&
-                  question.explanation.trim() &&
-                  question.options.every((option) => option.text.trim()),
-              );
-              if (!editTitle.trim() || cleanQuestions.length === 0) {
-                setSaveMessage('Please complete the title and all questions before saving.');
+              if (!editTitle.trim()) {
+                setExerciseSaveMessage('Please complete the exercise title before saving.');
                 return;
               }
 
@@ -403,83 +419,41 @@ function ExercisePage({
                 sectionTitle: editSectionTitle,
               });
 
-              for (const [index, question] of cleanQuestions.entries()) {
-                const existing = exercise.questions[index];
-                if (!existing) break;
-                await apiSend(`/api/questions/${existing.id}`, 'PUT', {
-                  prompt: question.prompt,
-                  explanation: question.explanation,
-                  correctOptionIndex: question.correctOptionIndex,
-                  options: question.options,
-                });
-              }
-
-              setSaveMessage('Saved successfully.');
+              setExerciseSaveMessage('Saved successfully.');
               await onRefresh();
-              setIsEditing(false);
+              setIsEditingExercise(false);
             } finally {
-              setSaving(false);
+              setSavingExercise(false);
             }
           }}
-          saving={saving}
-          saveMessage={saveMessage}
+          saving={savingExercise}
+          saveMessage={exerciseSaveMessage}
         />
       ) : (
         <>
           <div className="stack">
             {exercise.questions.map((question, index) => (
-              <article className="question" key={question.id}>
-                <div className="question-head">
-                  <div className="question-title">
-                    <div className="question-number">Question {index + 1}</div>
-                    <RichText value={question.prompt} />
-                  </div>
-                </div>
-
-                <div className="options">
-                  {['A', 'B', 'C', 'D'].map((label, index) => {
-                    const orderedOptionId = optionOrder[question.id]?.[index] ?? question.options[index]?.id;
-                    const option = question.options.find((item) => item.id === orderedOptionId);
-                    if (!option) {
-                      return null;
-                    }
-                    const selected = option.id === answers[question.id];
-                    const correct = option.id === question.correctOptionId;
-                    const hasAnswer = Boolean(answers[question.id]);
-                    const showFeedback = submitted || hasAnswer;
-                    const stateClass = showFeedback
-                      ? correct
-                        ? 'option correct'
-                        : selected
-                          ? 'option wrong'
-                          : 'option'
-                      : selected
-                        ? 'option selected'
-                        : 'option';
-
-                    return (
-                      <button
-                        key={option.id}
-                        className={stateClass}
-                        disabled={hasAnswer}
-                        onClick={() => setAnswers((current) => ({ ...current, [question.id]: option.id }))}
-                      >
-                        <span className="circle">{label}</span>
-                        <span className="option-text">
-                          <RichText value={option.text} />
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {answers[question.id] && (
-                  <div className={`feedback ${answers[question.id] === question.correctOptionId ? 'good' : 'bad'}`}>
-                    {answers[question.id] === question.correctOptionId ? 'Correct.' : 'Incorrect.'}{' '}
-                    <RichText value={question.explanation} />
-                  </div>
-                )}
-              </article>
+              <QuestionCard
+                key={question.id}
+                question={question}
+                questionNumber={index + 1}
+                isEditing={questionEditId === question.id}
+                onOpenEdit={() => setQuestionEditId(question.id)}
+                onCancelEdit={() => setQuestionEditId(null)}
+                onSave={async (payload) => {
+                  await apiSend(`/api/questions/${question.id}`, 'PUT', payload);
+                  await onRefresh();
+                  setQuestionEditId(null);
+                }}
+                onDelete={async () => {
+                  await apiSend(`/api/questions/${question.id}`, 'DELETE');
+                  await onRefresh();
+                }}
+                optionOrder={optionOrder[question.id] ?? ['A', 'B', 'C', 'D']}
+                answer={answers[question.id]}
+                submitted={submitted}
+                onSelectAnswer={(optionId) => setAnswers((current) => ({ ...current, [question.id]: optionId }))}
+              />
             ))}
           </div>
 
@@ -516,6 +490,284 @@ function ExercisePage({
   );
 }
 
+function ExerciseMetaEditor({
+  sections,
+  sectionTitle,
+  title,
+  description,
+  onChangeSectionTitle,
+  onChangeTitle,
+  onChangeDescription,
+  onSave,
+  saving,
+  saveMessage,
+}: {
+  sections: Section[];
+  sectionTitle: string;
+  title: string;
+  description: string;
+  onChangeSectionTitle: (value: string) => void;
+  onChangeTitle: (value: string) => void;
+  onChangeDescription: (value: string) => void;
+  onSave: () => Promise<void>;
+  saving?: boolean;
+  saveMessage?: string;
+}) {
+  return (
+    <section className="form-page">
+      <div className="form-grid">
+        <label>
+          Section
+          <select value={sectionTitle} onChange={(e) => onChangeSectionTitle(e.target.value)}>
+            {sections.map((section) => (
+              <option key={section.id} value={section.title}>
+                {section.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Exercise title
+          <input value={title} onChange={(e) => onChangeTitle(e.target.value)} />
+        </label>
+        <label className="full">
+          Description
+          <input value={description} onChange={(e) => onChangeDescription(e.target.value)} />
+        </label>
+      </div>
+
+      <div className="actions">
+        <button className="primary" onClick={onSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save Exercise'}
+        </button>
+        {saveMessage && <div className="result">{saveMessage}</div>}
+      </div>
+    </section>
+  );
+}
+
+function QuestionCard({
+  question,
+  questionNumber,
+  isEditing,
+  onOpenEdit,
+  onCancelEdit,
+  onSave,
+  onDelete,
+  optionOrder,
+  answer,
+  submitted,
+  onSelectAnswer,
+}: {
+  question: Question;
+  questionNumber: number;
+  isEditing: boolean;
+  onOpenEdit: () => void;
+  onCancelEdit: () => void;
+  onSave: (payload: DraftQuestion) => Promise<void>;
+  onDelete: () => Promise<void>;
+  optionOrder: string[];
+  answer?: string;
+  submitted: boolean;
+  onSelectAnswer: (optionId: string) => void;
+}) {
+  const [draft, setDraft] = useState<DraftQuestion>(() => questionToDraft(question));
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
+  useEffect(() => {
+    setDraft(questionToDraft(question));
+    setSaveMessage('');
+  }, [question]);
+
+  if (isEditing) {
+    return (
+      <article className="question">
+        <div className="page-head compact">
+          <h3>Question {questionNumber}</h3>
+          <div className="actions">
+            <button className="ghost" onClick={onCancelEdit}>
+              Cancel
+            </button>
+            <button
+              className="ghost danger"
+              onClick={async () => {
+                await onDelete();
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <QuestionEditorPanel
+          draft={draft}
+          onChangeDraft={setDraft}
+          onSave={async () => {
+            setSaving(true);
+            setSaveMessage('');
+            try {
+              if (!draft.prompt.trim() || !draft.explanation.trim() || !draft.options.every((option) => option.text.trim())) {
+                setSaveMessage('Please complete the question before saving.');
+                return;
+              }
+              await onSave(draft);
+            } finally {
+              setSaving(false);
+            }
+          }}
+          saving={saving}
+          saveMessage={saveMessage}
+        />
+      </article>
+    );
+  }
+
+  return (
+    <article className="question">
+      <div className="question-head">
+        <div className="question-title">
+          <div className="question-number">Question {questionNumber}</div>
+          <RichText value={question.prompt} />
+        </div>
+        <div className="actions">
+          <button className="ghost" onClick={onOpenEdit}>
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <div className="options">
+        {['A', 'B', 'C', 'D'].map((label, index) => {
+          const orderedOptionId = optionOrder[index] ?? question.options[index]?.id;
+          const option = question.options.find((item) => item.id === orderedOptionId);
+          if (!option) {
+            return null;
+          }
+          const selected = option.id === answer;
+          const correct = option.id === question.correctOptionId;
+          const hasAnswer = Boolean(answer);
+          const showFeedback = submitted || hasAnswer;
+          const stateClass = showFeedback
+            ? correct
+              ? 'option correct'
+              : selected
+                ? 'option wrong'
+                : 'option'
+            : selected
+              ? 'option selected'
+              : 'option';
+
+          return (
+            <button
+              key={option.id}
+              className={stateClass}
+              disabled={hasAnswer}
+              onClick={() => onSelectAnswer(option.id)}
+            >
+              <span className="circle">{label}</span>
+              <span className="option-text">
+                <RichText value={option.text} />
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {answer && (
+        <div className={`feedback ${answer === question.correctOptionId ? 'good' : 'bad'}`}>
+          {answer === question.correctOptionId ? 'Correct.' : 'Incorrect.'}{' '}
+          <RichText value={question.explanation} />
+        </div>
+      )}
+    </article>
+  );
+}
+
+function QuestionEditorPanel({
+  draft,
+  onChangeDraft,
+  onSave,
+  saving,
+  saveMessage,
+}: {
+  draft: DraftQuestion;
+  onChangeDraft: React.Dispatch<React.SetStateAction<DraftQuestion>>;
+  onSave: () => Promise<void>;
+  saving: boolean;
+  saveMessage: string;
+}) {
+  return (
+    <>
+      <label>
+        Question prompt
+        <textarea value={draft.prompt} onChange={(e) => onChangeDraft((current) => ({ ...current, prompt: e.target.value }))} rows={5} />
+      </label>
+
+      <div className="editor-grid">
+        {draft.options.map((option, optionIndex) => (
+          <div className="editor-option" key={optionIndex}>
+            <label>
+              Option {String.fromCharCode(65 + optionIndex)}
+              <textarea
+                value={option.text}
+                onChange={(e) =>
+                  onChangeDraft((current) => ({
+                    ...current,
+                    options: current.options.map((opt, j) => (j === optionIndex ? { ...opt, text: e.target.value } : opt)),
+                  }))
+                }
+                rows={4}
+              />
+            </label>
+          </div>
+        ))}
+      </div>
+
+      <div className="form-grid">
+        <label className="full">
+          Explanation
+          <textarea
+            value={draft.explanation}
+            onChange={(e) => onChangeDraft((current) => ({ ...current, explanation: e.target.value }))}
+            rows={4}
+          />
+        </label>
+      </div>
+
+      <div className="form-grid">
+        <label className="full">
+          Correct answer
+          <select
+            value={draft.correctOptionIndex}
+            onChange={(e) =>
+              onChangeDraft((current) => ({
+                ...current,
+                correctOptionIndex: Number(e.target.value),
+              }))
+            }
+          >
+            {draft.options.map((option, optionIndex) => (
+              <option key={optionIndex} value={optionIndex}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <MediaLibrary />
+
+      <div className="actions">
+        <button className="primary" onClick={onSave} disabled={saving}>
+          {saving ? 'Saving...' : 'Save Question'}
+        </button>
+        {saveMessage && <div className="result">{saveMessage}</div>}
+      </div>
+    </>
+  );
+}
+
 function ExerciseEditor({
   sections,
   sectionTitle,
@@ -527,6 +779,7 @@ function ExerciseEditor({
   onChangeDescription,
   onChangeQuestions,
   onAddQuestion,
+  onAddQuestionAtEnd,
   onRemoveQuestion,
   onSave,
   saving,
@@ -541,7 +794,8 @@ function ExerciseEditor({
   onChangeTitle: (value: string) => void;
   onChangeDescription: (value: string) => void;
   onChangeQuestions: React.Dispatch<React.SetStateAction<DraftQuestion[]>>;
-  onAddQuestion: () => void;
+  onAddQuestion: (questionIndex: number) => void;
+  onAddQuestionAtEnd: () => void;
   onRemoveQuestion: (questionIndex: number) => void;
   onSave: () => Promise<void>;
   saving?: boolean;
@@ -576,7 +830,7 @@ function ExerciseEditor({
             <div className="page-head compact">
               <h3>Question {questionIndex + 1}</h3>
               <div className="actions">
-                <button className="ghost" onClick={onAddQuestion}>
+                <button className="ghost" onClick={() => onAddQuestion(questionIndex)}>
                   Add question
                 </button>
                 {questions.length > 1 && (
@@ -659,12 +913,135 @@ function ExerciseEditor({
         <button className="primary" onClick={onSave} disabled={saving}>
           {saving ? 'Saving...' : 'Save'}
         </button>
-        <button className="ghost" onClick={onAddQuestion}>
+        <button className="ghost" onClick={onAddQuestionAtEnd}>
           Add question
         </button>
         {saveMessage && <div className="result">{saveMessage}</div>}
       </div>
+
+      <MediaLibrary />
     </section>
+  );
+}
+
+function MediaLibrary() {
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [loadingMedia, setLoadingMedia] = useState(false);
+  const [mediaError, setMediaError] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  const loadMedia = async () => {
+    setLoadingMedia(true);
+    setMediaError('');
+    try {
+      const items = await apiGet<MediaItem[]>('/api/media');
+      setMediaItems(items);
+    } catch {
+      setMediaError('Failed to load media files.');
+    } finally {
+      setLoadingMedia(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadMedia();
+  }, []);
+
+  return (
+    <section className="card media-library">
+      <div className="page-head compact">
+        <div>
+          <h3>Media Library</h3>
+          <p className="meta">Upload an image or audio file, then copy the URL into Markdown.</p>
+        </div>
+      </div>
+
+      <MediaUpload
+        uploading={uploading}
+        onUpload={async (file) => {
+          setUploading(true);
+          setMediaError('');
+          try {
+            await uploadMedia(file);
+            await loadMedia();
+          } catch {
+            setMediaError('Failed to upload media.');
+          } finally {
+            setUploading(false);
+          }
+        }}
+      />
+
+      {mediaError && <p className="error">{mediaError}</p>}
+      {loadingMedia ? (
+        <p>Loading media...</p>
+      ) : (
+        <div className="media-list">
+          {mediaItems.map((item) => (
+            <article className="media-item" key={item.name}>
+              {item.type === 'image' || item.url.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? (
+                <img className="media-preview" src={item.url} alt={item.name} />
+              ) : (
+                <audio controls src={item.url} className="media-audio" />
+              )}
+              <div className="media-meta">
+                <code className="media-url">{item.url}</code>
+                <div className="actions">
+                  <button
+                    className="ghost"
+                    onClick={async () => {
+                      const isAudio = item.type === 'audio' || item.url.match(/\.(mp3|wav|ogg)$/i);
+                      const snippet = isAudio
+                        ? `<audio controls src="${item.url}"></audio>`
+                        : `![](${item.url})`;
+                      await navigator.clipboard.writeText(snippet);
+                    }}
+                  >
+                    Copy Snippet
+                  </button>
+                  <button
+                    className="ghost danger"
+                    onClick={async () => {
+                      await deleteMedia(item.name);
+                      await loadMedia();
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function MediaUpload({
+  uploading,
+  onUpload,
+}: {
+  uploading: boolean;
+  onUpload: (file: File) => Promise<void>;
+}) {
+  return (
+    <div className="form-grid">
+      <label className="full">
+        Upload image or audio
+        <input
+          type="file"
+          accept="image/*,audio/*"
+          disabled={uploading}
+          onChange={async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            await onUpload(file);
+            event.target.value = '';
+          }}
+        />
+      </label>
+    </div>
   );
 }
 
@@ -727,7 +1104,14 @@ function CreatePage({
         onChangeTitle={setTitle}
         onChangeDescription={setDescription}
         onChangeQuestions={setQuestions}
-        onAddQuestion={() => setQuestions((current) => [...current, createEmptyDraftQuestion()])}
+        onAddQuestion={(questionIndex) =>
+          setQuestions((current) => {
+            const next = [...current];
+            next.splice(questionIndex + 1, 0, createEmptyDraftQuestion());
+            return next;
+          })
+        }
+        onAddQuestionAtEnd={() => setQuestions((current) => [...current, createEmptyDraftQuestion()])}
         onRemoveQuestion={(questionIndex) => setQuestions((current) => current.filter((_, i) => i !== questionIndex))}
         onSave={submit}
       />

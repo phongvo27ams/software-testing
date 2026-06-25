@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import rehypeRaw from 'rehype-raw';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import 'katex/dist/katex.min.css';
@@ -10,7 +11,7 @@ export function RichText({ value }: { value: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex, rehypeHighlight]}
+      rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
       components={{
         p: ({ ...props }) => <p className="md-paragraph" {...props} />,
         pre: ({ ...props }) => <pre className="md-pre" {...props} />,
