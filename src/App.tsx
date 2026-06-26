@@ -30,19 +30,19 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet accumsan a
 > Nunc vulputate, nibh eget commodo egestas, lacus ex sodales purus, at varius libero massa nec odio.
 
 \`\`\`ts
-type BookSection = {
+type BookEntry = {
   id: string;
   title: string;
   paragraphCount: number;
 };
 
-const section: BookSection = {
+const entry: BookEntry = {
   id: 'chapter-1',
   title: 'Foundations',
   paragraphCount: 3,
 };
 
-console.log(section.title.toUpperCase());
+console.log(entry.title.toUpperCase());
 \`\`\`
 
 ### 1.1.2 A Small Formula

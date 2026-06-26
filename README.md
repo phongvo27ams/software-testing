@@ -81,7 +81,6 @@ The print layout hides navigation and keeps the page book-like for PDF output.
 
 ## Notes
 
-- This project no longer includes quiz logic.
 - There is no database, backend API, or external media service in the current version.
 - All content is local and static.
 
