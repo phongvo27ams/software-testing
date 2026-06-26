@@ -17,3 +17,6 @@ prisma/*.db
 
 .DS_Store
 Thumbs.db
+
+.codex
+.agents

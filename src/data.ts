@@ -6,6 +6,7 @@ const code = (lang: string, body: string) => `\`\`\`${lang}\n${body}\n\`\`\``;
 export const initialSections: Section[] = [
   {
     id: 'black-box-testing',
+    topicId: 'software-testing-topic',
     title: 'Black Box Testing',
     description: 'Testing techniques focused on input, output, and observable behavior.',
     exercises: [
@@ -149,6 +150,7 @@ export const initialSections: Section[] = [
   },
   {
     id: 'test-automation',
+    topicId: 'software-testing-topic',
     title: 'Test Automation',
     description: 'Exercises focused on automation strategy, locators, and test stability.',
     exercises: [

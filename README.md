@@ -1,141 +1,89 @@
-# Quiz Studio
+# Markdown Book
 
-Quiz Studio is a simple quiz web app for software testing exercises.
+Markdown Book is a single-page static documentation workspace built like a book.
 
-It supports:
-- Section-based exercise browsing
-- Multiple-choice questions with auto numbering
-- Immediate correct / wrong feedback
-- Rich content in questions and explanations:
-  - Markdown text
-  - Code syntax highlighting
-  - Math formulas
-  - Tables
-  - Images
-- Exercise creation and editing
-- Score summary at the end of an exercise
-- Full-stack deployment support with PostgreSQL + Neon and Vercel
-- Media uploads that can use local storage in development or ImageKit in production
+It is designed for:
+- writing long-form content in Markdown
+- styling pages with CSS and reusable tokens
+- rendering code blocks, math formulas, tables, and images
+- exporting the page to PDF through the browser print dialog
+
+## Features
+
+- One-page book layout with a cover page
+- Sidebar table of contents for quick navigation
+- Chapter content rendered from Markdown
+- Heading support down to subsection level 3
+- Syntax highlighting for code blocks
+- Math rendering with KaTeX
+- Responsive image and table rendering
+- Print-friendly output for PDF export
 
 ## Tech Stack
 
 - Frontend: React + TypeScript + Vite
-- Styling: Plain CSS with shared design tokens
-- Content rendering: Markdown, KaTeX, Highlight.js
-- Backend: Node.js + Express
-- Database: Prisma + PostgreSQL
-- Production hosting: Vercel
-- Media storage: ImageKit or local disk in development
+- Styling: Plain CSS with design tokens
+- Content rendering: React Markdown, KaTeX, Highlight.js
+- Hosting target: static hosting such as GitHub Pages or Vercel
 
 ## Project Structure
 
-- `src/` - React frontend
-- `server/` - Express API
-- `prisma/` - Prisma schema and seed data
+- `src/` - React frontend and book layout
+- `public/` - static assets
 
-## Local Setup
+## Local Development
 
-### 1. Install dependencies
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Set up the database
-
-The project uses PostgreSQL locally through Prisma and the same PostgreSQL schema on Neon in production.
-
-```bash
-npx prisma generate --no-engine
-npx prisma db push
-npm run seed
-```
-
-Set `DATABASE_URL` in `.env` before running the commands.
-
-### 3. Start the app
+### Start the app
 
 ```bash
 npm run dev
 ```
 
-This starts both:
-- the Express API
-- the Vite frontend
+The app runs as a single page at `http://localhost:5173/`.
 
-Open the URL shown in the terminal.
+## Build
 
-## Available Scripts
-
-- `npm run dev` - start both the frontend and backend in development
-- `npm run dev:client` - start only the frontend
-- `npm run dev:server` - start only the backend API
-- `npm run build` - build the frontend for production
-- `npm run seed` - populate the database with sample sections and exercises
-- `npm run prisma:generate` - generate Prisma Client
-- `npm run prisma:push` - push the Prisma schema to the configured PostgreSQL database
-
-## Database Notes
-
-- The app now uses PostgreSQL through `DATABASE_URL`
-- For local development you can use a local PostgreSQL instance
-- For production on Vercel, point `DATABASE_URL` to Neon
-- Schema changes should be made in `prisma/schema.prisma`
-- Sample data is generated through `prisma/seed.ts`
-
-## Deployment Notes
-
-GitHub Pages can host only the static frontend.
-
-If you deploy to GitHub Pages:
-- the React UI can be hosted there
-- the Express API and SQLite database cannot run there
-
-To support quiz content on GitHub Pages, this repo exports the current Prisma data into `public/quiz-data.json` before build. The frontend falls back to that file when the API is unavailable.
-
-For a full-stack deployment, use Vercel:
-- the frontend is built from Vite
-- the API runs as a serverless function from `api/index.ts`
-- Prisma connects to Neon through `DATABASE_URL`
-- media uploads can go to ImageKit if `IMAGEKIT_*` env vars are configured
+```bash
+npm run build
+```
 
 ## GitHub Pages Deploy
 
-This repository includes a GitHub Actions workflow that deploys from `main` automatically.
+This repository includes a GitHub Actions workflow that deploys the static site automatically whenever you push to `main`.
 
-Flow:
-- push to `main`
-- install dependencies
-- generate Prisma client
-- push the Prisma schema
-- seed the local SQLite database in CI
-- export quiz data to `public/quiz-data.json`
-- build the Vite app
-- publish the `dist/` folder to GitHub Pages
+What the workflow does:
+- checks out the code
+- installs dependencies
+- builds the Vite app
+- publishes the `dist/` folder to GitHub Pages
 
-For the workflow to work, enable GitHub Pages in the repository settings and set the source to the `gh-pages` branch if your repo uses branch-based Pages deployment.
+Before using GitHub Pages:
+- enable GitHub Pages in the repository settings
+- set the source to GitHub Actions
 
-## Media Storage
+## Print to PDF
 
-By default, uploaded media is saved to the local `public/media/` folders during development.
+Use the browser print dialog:
 
-To use ImageKit in production, set:
+```bash
+window.print()
+```
 
-- `IMAGEKIT_PUBLIC_KEY`
-- `IMAGEKIT_PRIVATE_KEY`
-- `IMAGEKIT_URL_ENDPOINT`
+Or click the `Export PDF` button in the cover section.
 
-When those variables are present, uploads go to ImageKit instead of the local filesystem.
+The print layout hides navigation and keeps the page book-like for PDF output.
 
-## Environment Variables
+## Notes
 
-Copy `.env.example` to `.env` and fill in:
-
-- `DATABASE_URL`
-- `PORT`
-- `IMAGEKIT_PUBLIC_KEY`
-- `IMAGEKIT_PRIVATE_KEY`
-- `IMAGEKIT_URL_ENDPOINT`
+- This project no longer includes quiz logic.
+- There is no database, backend API, or external media service in the current version.
+- All content is local and static.
 
 ## License
 

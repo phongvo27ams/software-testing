@@ -15,6 +15,7 @@ export type Question = {
 export type Exercise = {
   id: string;
   sectionTitle: string;
+  topicTitle?: string;
   title: string;
   description: string;
   questions: Question[];
@@ -22,7 +23,16 @@ export type Exercise = {
 
 export type Section = {
   id: string;
+  topicId: string;
+  topicTitle?: string;
   title: string;
   description: string;
   exercises: Exercise[];
+};
+
+export type Topic = {
+  id: string;
+  title: string;
+  description: string;
+  sections: Section[];
 };

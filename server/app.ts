@@ -27,33 +27,41 @@ export function createApp() {
     res.json(exercises);
   });
 
-  app.get('/api/sections', async (_req, res) => {
-    const sections = await prisma.section.findMany({
+  app.get('/api/topics', async (_req, res) => {
+    const topics = await prisma.topic.findMany({
       orderBy: { title: 'asc' },
       include: {
-        exercises: {
-          orderBy: { createdAt: 'asc' },
-          include: { questions: { orderBy: { orderIndex: 'asc' }, include: { options: true } } },
+        sections: {
+          orderBy: { title: 'asc' },
+          include: {
+            exercises: {
+              orderBy: { createdAt: 'asc' },
+              include: { questions: { orderBy: { orderIndex: 'asc' }, include: { options: true } } },
+            },
+          },
         },
       },
     });
     res.json(
-      sections.map((section) => ({
-        ...section,
-        exercises: section.exercises.map((exercise) => ({
-          ...exercise,
-          sectionTitle: section.title,
+      topics.map((topic) => ({
+        ...topic,
+        sections: topic.sections.map((section) => ({
+          ...section,
+          topicTitle: topic.title,
+          exercises: section.exercises.map((exercise) => ({
+            ...exercise,
+            sectionTitle: section.title,
+            topicTitle: topic.title,
+          })),
         })),
       })),
     );
   });
 
-  app.post('/api/sections', async (req, res) => {
+  app.post('/api/topics', async (req, res) => {
     const { title, description } = req.body as { title: string; description: string };
-    if (!title?.trim()) {
-      return res.status(400).json({ message: 'Section title is required.' });
-    }
-    const created = await prisma.section.create({
+    if (!title?.trim()) return res.status(400).json({ message: 'Topic title is required.' });
+    const created = await prisma.topic.create({
       data: {
         id: createId(),
         title: title.trim(),
@@ -63,14 +71,86 @@ export function createApp() {
     res.status(201).json(created);
   });
 
-  app.put('/api/sections/:id', async (req, res) => {
+  app.put('/api/topics/:id', async (req, res) => {
     const { title, description } = req.body as { title: string; description: string };
+    if (!title?.trim()) return res.status(400).json({ message: 'Topic title is required.' });
+    const updated = await prisma.topic.update({
+      where: { id: req.params.id },
+      data: { title: title.trim(), description: description?.trim() || '' },
+    });
+    res.json(updated);
+  });
+
+  app.delete('/api/topics/:id', async (req, res) => {
+    const sectionCount = await prisma.section.count({ where: { topicId: req.params.id } });
+    if (sectionCount > 0) return res.status(409).json({ message: 'Cannot delete a topic that still has sections.' });
+    await prisma.topic.delete({ where: { id: req.params.id } });
+    res.status(204).send();
+  });
+
+  app.get('/api/sections', async (_req, res) => {
+    const sections = await prisma.section.findMany({
+      orderBy: { title: 'asc' },
+      include: {
+        topic: true,
+        exercises: {
+          orderBy: { createdAt: 'asc' },
+          include: { questions: { orderBy: { orderIndex: 'asc' }, include: { options: true } } },
+        },
+      },
+    });
+    res.json(
+      sections.map((section) => ({
+        ...section,
+        topicTitle: section.topic.title,
+        exercises: section.exercises.map((exercise) => ({
+          ...exercise,
+          sectionTitle: section.title,
+          topicTitle: section.topic.title,
+        })),
+      })),
+    );
+  });
+
+  app.post('/api/sections', async (req, res) => {
+    const { title, description, topicId } = req.body as { title: string; description: string; topicId: string };
     if (!title?.trim()) {
       return res.status(400).json({ message: 'Section title is required.' });
+    }
+    if (!topicId?.trim()) {
+      return res.status(400).json({ message: 'Topic is required.' });
+    }
+    const topicExists = await prisma.topic.findUnique({ where: { id: topicId } });
+    if (!topicExists) {
+      return res.status(400).json({ message: 'Valid topicId is required.' });
+    }
+    const created = await prisma.section.create({
+      data: {
+        id: createId(),
+        topicId,
+        title: title.trim(),
+        description: description?.trim() || '',
+      },
+    });
+    res.status(201).json(created);
+  });
+
+  app.put('/api/sections/:id', async (req, res) => {
+    const { title, description, topicId } = req.body as { title: string; description: string; topicId: string };
+    if (!title?.trim()) {
+      return res.status(400).json({ message: 'Section title is required.' });
+    }
+    if (!topicId?.trim()) {
+      return res.status(400).json({ message: 'Topic is required.' });
+    }
+    const topicExists = await prisma.topic.findUnique({ where: { id: topicId } });
+    if (!topicExists) {
+      return res.status(400).json({ message: 'Valid topicId is required.' });
     }
     const updated = await prisma.section.update({
       where: { id: req.params.id },
       data: {
+        topicId,
         title: title.trim(),
         description: description?.trim() || '',
       },
@@ -171,9 +251,7 @@ export function createApp() {
       data: {
         title,
         description,
-        sectionId: sectionTitle
-          ? (await prisma.section.findUnique({ where: { title: sectionTitle } }))?.id
-          : undefined,
+        sectionId: sectionTitle ? (await prisma.section.findUnique({ where: { title: sectionTitle } }))?.id : undefined,
       },
     });
     res.json(updated);
