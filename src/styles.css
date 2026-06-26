@@ -13,22 +13,17 @@
   --blue-400: #5dade2;
   --blue-500: #3598db;
   --bg: #ffffff;
-  --panel: #ffffff;
   --ink: #17324d;
   --muted: #557087;
   --line: #dce9f3;
   --brand: var(--blue-500);
   --brand-weak: #eff8fd;
-  --page-width: 82rem;
   --radius-box: 6px;
-  --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.25rem;
   --space-6: 1.5rem;
-  --space-7: 1.75rem;
-  --space-8: 2rem;
 }
 
 * {
@@ -232,10 +227,6 @@ img {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-}
-
-.book-toolbar {
-  display: none;
 }
 
 .primary,
