@@ -1,26 +1,26 @@
----
-title: Exercise 1
-summary: Choosing stable locators for a login page.
-route: /test-automation/locator-strategy/exercise-1
-level: 3
-order: 201
-parentRoute: /test-automation/locator-strategy
-sectionLabel: Exercise 1
----
+# Test Automation
 
-# Exercise 1. Locator Strategy
+## Locator Strategy
 
-## Scenario
+Pick selectors that are stable across UI refactors and easy to maintain.
+
+:::info
+A data-testid selector is often easier to maintain than a fragile XPath.
+:::
+
+### Exercise 1. Locator Strategy
+
+#### Scenario
 
 Select the most stable locator for a login button.
 
-### Good pattern
+#### Good pattern
 
 ```ts
 button[data-testid="login-button"]
 ```
 
-### Media
+#### Media
 
 ![Locator strategy screenshot](./media/images/locator.png)
 

@@ -24,6 +24,14 @@
   --space-4: 1rem;
   --space-5: 1.25rem;
   --space-6: 1.5rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
 }
 
 * {
@@ -72,9 +80,9 @@ img {
 }
 
 .book-shell {
-  width: min(98rem, calc(100% - 1rem));
+  width: min(76rem, calc(100% - 1.5rem));
   margin: 0 auto;
-  padding: 0 2.25rem 3rem;
+  padding: 0 1.5rem 3rem;
 }
 
 .book-cover {
@@ -125,13 +133,13 @@ img {
   background: var(--brand-weak);
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.72rem;
+  font-size: var(--text-sm);
 }
 
 .cover-edition {
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 
@@ -155,12 +163,12 @@ img {
   color: var(--brand);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: var(--text-sm);
   margin-bottom: var(--space-4);
 }
 
 .book-cover h1 {
-  font-size: clamp(3.4rem, 9vw, 6.1rem);
+  font-size: clamp(var(--text-4xl), 9vw, var(--text-5xl));
   line-height: 0.95;
   margin: 0 0 var(--space-5);
   max-width: 10ch;
@@ -169,7 +177,7 @@ img {
 
 .cover-subtitle {
   max-width: 48rem;
-  font-size: 1.22rem;
+  font-size: var(--text-lg);
   color: var(--muted);
   margin-bottom: 0;
 }
@@ -191,7 +199,7 @@ img {
 
 .cover-panel-label {
   margin-bottom: 0.8rem;
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--brand);
@@ -235,32 +243,13 @@ img {
   border: 1px solid var(--line);
   padding: 0.7rem 1rem;
   background: white;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
 .primary {
   background: var(--brand);
   color: white;
   border-color: var(--brand);
-}
-
-.book-layout {
-  display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr);
-  gap: 1.5rem;
-  align-items: start;
-  width: 100%;
-}
-
-.book-sidebar {
-  position: sticky;
-  top: 1.25rem;
-  display: grid;
-  gap: var(--space-3);
-  align-self: start;
-  width: 100%;
-  max-width: 14rem;
-  justify-self: start;
 }
 
 .sidebar-card {
@@ -271,7 +260,7 @@ img {
 
 .sidebar-card h2 {
   margin-top: 0;
-  font-size: 1.05rem;
+  font-size: var(--text-base);
 }
 
 .sidebar-card ol,
@@ -296,11 +285,33 @@ img {
   margin-top: 0.45rem;
 }
 
+.book-content {
+  width: min(68rem, 100%);
+  margin: 0 auto;
+}
+
+.contents-section {
+  padding: 0 0 1.5rem;
+  margin: 0 0 2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.contents-heading {
+  margin-bottom: 1rem;
+}
+
+.contents-heading h2 {
+  margin-bottom: 0;
+}
+
+.contents-tree {
+  max-width: 70rem;
+}
+
 .book-article {
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  grid-column: 2;
 }
 
 .chapter {
@@ -317,19 +328,19 @@ img {
   margin: 0 0 var(--space-2);
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.75rem;
+  font-size: var(--text-sm);
   color: var(--brand);
 }
 
 .chapter h2 {
-  font-size: 2rem;
+  font-size: var(--text-4xl);
   line-height: 1.15;
   margin-bottom: var(--space-3);
 }
 
 .chapter-summary {
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   margin-bottom: var(--space-5);
 }
 
@@ -341,19 +352,58 @@ img {
 h1,
 h2,
 h3,
+h4,
+h5,
+h6,
 p {
   margin-top: 0;
 }
 
+h1 {
+  font-size: var(--text-5xl);
+  line-height: 1.05;
+  margin-top: 2.4rem;
+  margin-bottom: 1.1rem;
+}
+
+h2 {
+  font-size: var(--text-4xl);
+  line-height: 1.12;
+  margin-top: 1.9rem;
+  margin-bottom: 0.9rem;
+}
+
 h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+  margin-top: 1.4rem;
+  margin-bottom: 0.7rem;
+}
+
+h4 {
+  font-size: var(--text-xl);
   line-height: 1.25;
-  margin-bottom: var(--space-3);
+  margin-top: 1.1rem;
+  margin-bottom: 0.55rem;
+}
+
+h5 {
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  margin-top: 0.9rem;
+  margin-bottom: 0.45rem;
+}
+
+h6 {
+  font-size: var(--text-base);
+  line-height: 1.35;
+  margin-top: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
 p {
-  font-size: 1rem;
-  margin-bottom: var(--space-3);
+  font-size: var(--text-base);
+  margin-bottom: 0.95rem;
 }
 
 .md-paragraph {
@@ -455,10 +505,11 @@ pre code {
   margin-bottom: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.03em;
+  font-size: var(--text-sm);
 }
 
 .md-callout-icon {
-  font-size: 1.1rem;
+  font-size: var(--text-base);
 }
 
 .md-callout-body p:last-child {
@@ -520,6 +571,11 @@ pre code {
 }
 
 @media (max-width: 960px) {
+  .book-shell {
+    width: calc(100% - 1rem);
+    padding: 0 0.5rem 2rem;
+  }
+
   .book-cover {
     padding: 3rem 1.5rem;
     min-height: auto;
@@ -533,15 +589,9 @@ pre code {
     justify-content: flex-start;
   }
 
-  .book-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .book-sidebar {
-    position: static;
+  .book-content {
+    width: 100%;
     max-width: none;
-    width: auto;
-    max-height: none;
   }
 }
 
@@ -561,9 +611,12 @@ pre code {
     padding: 0;
   }
 
+  .book-content {
+    width: 100%;
+  }
+
   .no-print,
-  .book-toolbar,
-  .book-sidebar {
+  .book-toolbar {
     display: none !important;
   }
 
@@ -573,12 +626,15 @@ pre code {
     margin-bottom: 1.2rem;
     border-bottom: 1px solid #000;
     background: white;
+    break-after: page;
+    page-break-after: always;
   }
 
-  .book-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
+  .contents-section {
+    padding: 0 0 1rem;
+    margin: 0 0 1.2rem;
+    break-after: page;
+    page-break-after: always;
   }
 
   .chapter {
@@ -587,6 +643,18 @@ pre code {
     padding-bottom: 1.8rem;
     margin-bottom: 1.8rem;
     border-bottom: 1px solid #000;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .section,
+  .subsection {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding-bottom: 1.4rem;
+    margin-bottom: 1.4rem;
+    break-after: page;
+    page-break-after: always;
   }
 
   img,

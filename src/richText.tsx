@@ -23,12 +23,12 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
-function headingRenderer(level: 1 | 2 | 3) {
+function headingRenderer(level: 1 | 2 | 3, idPrefix = '') {
   return function Heading({ children, ...props }: { children?: React.ReactNode }) {
     const text = Array.isArray(children) ? children.join(' ') : String(children ?? '');
     const Tag = `h${level}` as const;
     return (
-      <Tag id={slugify(text)} {...props}>
+      <Tag id={`${idPrefix}${slugify(text)}`} {...props}>
         {children}
       </Tag>
     );
@@ -65,7 +65,7 @@ function parseAdmonitions(value: string) {
   return output.join('\n');
 }
 
-export function RichText({ value }: { value: string }) {
+export function RichText({ value, idPrefix = '' }: { value: string; idPrefix?: string }) {
   const calloutTypes = {
     note: {
       label: 'NOTE',
@@ -117,9 +117,9 @@ export function RichText({ value }: { value: string }) {
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight, rehypeSlug]}
       components={{
-        h1: headingRenderer(1),
-        h2: headingRenderer(2),
-        h3: headingRenderer(3),
+        h1: headingRenderer(1, idPrefix),
+        h2: headingRenderer(2, idPrefix),
+        h3: headingRenderer(3, idPrefix),
         p: ({ ...props }) => <p className="md-paragraph" {...props} />,
         pre: ({ ...props }) => <pre className="md-pre" {...props} />,
         img: ({ ...props }) => <img className="md-image" alt="" {...props} />,
