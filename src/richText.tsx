@@ -4,6 +4,7 @@ import remarkMath from 'remark-math';
 import rehypeRaw from 'rehype-raw';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
+import rehypeSlug from 'rehype-slug';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github.css';
 
@@ -30,7 +31,7 @@ export function RichText({ value }: { value: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
+      rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight, rehypeSlug]}
       components={{
         h1: headingRenderer(1),
         h2: headingRenderer(2),

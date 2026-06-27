@@ -1,10 +1,10 @@
 # Markdown Book
 
-Markdown Book is a single-page static book workspace for writing long-form content in Markdown.
+Markdown Book is a static book workspace for writing long-form content in MDX.
 
 ## What it does
 
-- renders chapters, headings, tables, images, math, and code blocks
+- renders chapter and subsection pages from `docs/*.mdx`
 - provides a left table of contents for fast navigation
 - supports browser print export for PDF output
 - runs entirely as a static frontend, with no database or backend
@@ -15,6 +15,7 @@ Markdown Book is a single-page static book workspace for writing long-form conte
 - TypeScript
 - Vite
 - React Markdown
+- MDX
 - KaTeX
 - Highlight.js
 - Plain CSS with reusable design tokens
@@ -41,4 +42,3 @@ The repository is set up for GitHub Pages deployment from the `main` branch thro
 ## Print
 
 Use the browser print dialog or the `Export PDF` button on the cover page.
-

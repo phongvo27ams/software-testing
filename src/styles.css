@@ -280,6 +280,18 @@ img {
   padding-left: 1.1rem;
 }
 
+.sidebar-card ol {
+  list-style: none;
+}
+
+.sidebar-card > ol {
+  padding-left: 0;
+}
+
+.sidebar-card > ol > li > a {
+  margin-left: 0;
+}
+
 .sidebar-card li + li {
   margin-top: 0.45rem;
 }

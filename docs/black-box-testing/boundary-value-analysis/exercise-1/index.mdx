@@ -1,0 +1,38 @@
+---
+title: Exercise 1
+summary: Boundary value analysis for a hotel reservation flow.
+route: /black-box-testing/boundary-value-analysis/exercise-1
+level: 3
+order: 101
+parentRoute: /black-box-testing/boundary-value-analysis
+sectionLabel: Exercise 1
+---
+
+# Exercise 1. Boundary Value Analysis
+
+## Scenario
+
+A hotel reservation system allows stays from 1 to 14 nights.
+
+### Expected thinking
+
+The interesting test values sit at the edge of the range:
+
+- just below the minimum
+- exactly the minimum
+- exactly the maximum
+- just above the maximum
+
+### Reference code
+
+```ts
+const stayLengths = [0, 1, 2, 13, 14, 15];
+```
+
+### Test media
+
+![Boundary Value Analysis diagram](./media/images/bva-diagram.png)
+
+Audio note:
+
+<audio controls src="./media/audio/bva-note.mp3"></audio>

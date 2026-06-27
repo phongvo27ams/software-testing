@@ -1,0 +1,35 @@
+---
+title: Exercise 1
+summary: Equivalence partitioning for a shipping fee rule.
+route: /black-box-testing/equivalence-partitioning/exercise-1
+level: 3
+order: 111
+parentRoute: /black-box-testing/equivalence-partitioning
+sectionLabel: Exercise 1
+---
+
+# Exercise 1. Equivalence Partitioning
+
+## Scenario
+
+Shipping is free for orders above 100 USD.
+
+### Classes
+
+- valid free-shipping orders
+- valid paid-shipping orders
+- invalid orders
+
+### Formula
+
+$$
+fee = price - discount
+$$
+
+### Table
+
+| Class | Example | Expected |
+| --- | --- | --- |
+| Free shipping | 120 | No fee |
+| Paid shipping | 80 | Fee applies |
+| Invalid | -1 | Reject |
