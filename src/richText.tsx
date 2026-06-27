@@ -5,6 +5,14 @@ import rehypeRaw from 'rehype-raw';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCircleInfo,
+  faCircleExclamation,
+  faTriangleExclamation,
+  faCircleCheck,
+  faCircleXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github.css';
 
@@ -27,7 +35,83 @@ function headingRenderer(level: 1 | 2 | 3) {
   };
 }
 
+function parseAdmonitions(value: string) {
+  const lines = value.split('\n');
+  const output: string[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const openMatch = /^:::(note|tip|info|warning|danger)\s*$/.exec(lines[index].trim());
+    if (!openMatch) {
+      output.push(lines[index]);
+      index += 1;
+      continue;
+    }
+
+    const type = openMatch[1];
+    index += 1;
+    const body: string[] = [];
+    while (index < lines.length && lines[index].trim() !== ':::') {
+      body.push(lines[index]);
+      index += 1;
+    }
+    if (index < lines.length && lines[index].trim() === ':::') {
+      index += 1;
+    }
+
+    output.push(`<div class="md-callout md-callout-${type}">\n${body.join('\n')}\n</div>`);
+  }
+
+  return output.join('\n');
+}
+
 export function RichText({ value }: { value: string }) {
+  const calloutTypes = {
+    note: {
+      label: 'NOTE',
+      icon: faCircleInfo,
+    },
+    tip: {
+      label: 'TIP',
+      icon: faCircleCheck,
+    },
+    info: {
+      label: 'INFO',
+      icon: faCircleExclamation,
+    },
+    warning: {
+      label: 'WARNING',
+      icon: faTriangleExclamation,
+    },
+    danger: {
+      label: 'DANGER',
+      icon: faCircleXmark,
+    },
+  } as const;
+
+  function Callout({
+    type,
+    children,
+  }: {
+    type: keyof typeof calloutTypes;
+    children?: React.ReactNode;
+  }) {
+    const meta = calloutTypes[type];
+    return (
+      <div className={`md-callout md-callout-${type}`}>
+        <div className="md-callout-header">
+          <FontAwesomeIcon className="md-callout-icon" icon={meta.icon} />
+          <span>{meta.label}</span>
+        </div>
+        <div className="md-callout-body">{children}</div>
+      </div>
+    );
+  }
+
+  const CalloutSection = ({ type, children }: { type: keyof typeof calloutTypes; children?: React.ReactNode }) => (
+    <Callout type={type}>{children}</Callout>
+  );
+
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
@@ -44,9 +128,22 @@ export function RichText({ value }: { value: string }) {
             <table className="md-table" {...props} />
           </div>
         ),
+        div: ({ children, ...props }) => {
+          const className = String((props as { className?: string }).className ?? '');
+          if (className.includes('callout')) {
+            const type = (className.match(/callout-(note|tip|info|warning|danger)/)?.[1] ?? 'note') as
+              | 'note'
+              | 'tip'
+              | 'info'
+              | 'warning'
+              | 'danger';
+            return <CalloutSection type={type}>{children}</CalloutSection>;
+          }
+          return <div {...props}>{children}</div>;
+        },
       }}
     >
-      {value}
+      {parseAdmonitions(value)}
     </ReactMarkdown>
   );
 }

@@ -439,6 +439,82 @@ pre code {
   margin-bottom: 0;
 }
 
+.md-callout {
+  margin: 1rem 0;
+  padding: 1rem 1rem 0.95rem;
+  border-radius: var(--radius-box);
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: 0 0.15rem 0.6rem rgba(23, 50, 77, 0.04);
+}
+
+.md-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.md-callout-icon {
+  font-size: 1.1rem;
+}
+
+.md-callout-body p:last-child {
+  margin-bottom: 0;
+}
+
+.md-callout-note {
+  border-left: 4px solid #8a8f98;
+  background: #fcfcfd;
+}
+
+.md-callout-note .md-callout-header,
+.md-callout-note .md-callout-icon {
+  color: #4f5b66;
+}
+
+.md-callout-tip {
+  border-left: 4px solid #22a06b;
+  background: #eaf8f0;
+}
+
+.md-callout-tip .md-callout-header,
+.md-callout-tip .md-callout-icon {
+  color: #118a53;
+}
+
+.md-callout-info {
+  border-left: 4px solid #39a7d5;
+  background: #eef8fc;
+}
+
+.md-callout-info .md-callout-header,
+.md-callout-info .md-callout-icon {
+  color: #177ca6;
+}
+
+.md-callout-warning {
+  border-left: 4px solid #e4a400;
+  background: #fff8e9;
+}
+
+.md-callout-warning .md-callout-header,
+.md-callout-warning .md-callout-icon {
+  color: #946b00;
+}
+
+.md-callout-danger {
+  border-left: 4px solid #e5484d;
+  background: #fff0f1;
+}
+
+.md-callout-danger .md-callout-header,
+.md-callout-danger .md-callout-icon {
+  color: #bd1e27;
+}
+
 .no-print {
   display: block;
 }
