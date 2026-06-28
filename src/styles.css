@@ -87,7 +87,8 @@ img {
 
 .book-cover {
   position: relative;
-  min-height: 62vh;
+  min-height: calc(100vh - 3rem);
+  min-height: calc(100svh - 3rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -152,6 +153,8 @@ img {
 
 .cover-main {
   max-width: 52rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .cover-kicker {
@@ -167,34 +170,68 @@ img {
   margin-bottom: var(--space-4);
 }
 
+.cover-overline {
+  max-width: 36rem;
+  margin: 0 0 1.2rem;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
 .book-cover h1 {
-  font-size: clamp(var(--text-4xl), 9vw, var(--text-5xl));
-  line-height: 0.95;
-  margin: 0 0 var(--space-5);
-  max-width: 10ch;
+  font-size: clamp(3.6rem, 9vw, 5.75rem);
+  line-height: 0.9;
+  margin: 0 0 1.5rem;
+  max-width: 12ch;
   letter-spacing: -0.03em;
 }
 
 .cover-subtitle {
-  max-width: 48rem;
-  font-size: var(--text-lg);
+  max-width: 40rem;
+  font-size: 1.2rem;
+  line-height: 1.75;
   color: var(--muted);
-  margin-bottom: 0;
+  margin-bottom: 2rem;
+}
+
+.cover-author-block {
+  margin-top: auto;
+  padding-top: 2.25rem;
+  border-top: 1px solid rgba(53, 152, 219, 0.18);
+  max-width: 18rem;
+}
+
+.cover-author-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.cover-author-name {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .cover-aside {
   display: flex;
   justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .cover-panel {
   width: 100%;
   max-width: 20rem;
-  padding: 1.4rem 1.5rem;
+  padding: 1.5rem 1.6rem;
   border-radius: 1rem;
-  border: 1px solid rgba(53, 152, 219, 0.18);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 1rem 2rem rgba(53, 152, 219, 0.08);
+  border: 1px solid rgba(53, 152, 219, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1.25rem 2.5rem rgba(53, 152, 219, 0.1);
 }
 
 .cover-panel-label {
@@ -220,7 +257,7 @@ img {
   flex-wrap: wrap;
   gap: var(--space-3);
   color: var(--muted);
-  margin: var(--space-6) 0;
+  margin: 2rem 0 0;
 }
 
 .cover-meta span {
@@ -235,6 +272,10 @@ img {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+}
+
+.cover-actions {
+  margin-top: 1.5rem;
 }
 
 .primary,
@@ -638,7 +679,8 @@ pre code {
 
   .book-cover {
     padding: 3rem 1.5rem;
-    min-height: auto;
+    min-height: calc(100vh - 1rem);
+    min-height: calc(100svh - 1rem);
   }
 
   .cover-grid {
@@ -657,22 +699,32 @@ pre code {
 
 @media print {
   @page {
-    margin: 14mm 12mm;
+    margin: 2.5cm;
   }
 
+  @page :first {
+    margin: 0;
+  }
+
+  html,
   body {
     background: white;
     color: black;
     font-size: 11pt;
+    margin: 0;
+    padding: 0;
   }
 
   .book-shell {
     width: 100%;
     padding: 0;
+    margin: 0;
   }
 
   .book-content {
     width: 100%;
+    max-width: none;
+    margin: 0;
   }
 
   .no-print,
@@ -681,40 +733,55 @@ pre code {
   }
 
   .book-cover {
-    min-height: auto;
-    padding: 1.5rem;
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid #000;
-    background: white;
+    height: 297mm;
+    min-height: 0;
+    padding: 18mm 16mm;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(53, 152, 219, 0.18), transparent 20%),
+      radial-gradient(circle at 88% 78%, rgba(174, 214, 240, 0.35), transparent 18%),
+      linear-gradient(135deg, rgba(53, 152, 219, 0.08), transparent 45%),
+      linear-gradient(180deg, #ffffff 0%, #f9fcff 100%);
+    overflow: hidden;
+    box-shadow: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     break-after: page;
     page-break-after: always;
   }
 
+  .book-cover::before {
+    display: none;
+  }
+
   .contents-section {
-    padding: 0 0 1rem;
-    margin: 0 0 1.2rem;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    border: 0;
     break-after: page;
     page-break-after: always;
   }
 
   .chapter {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    padding-bottom: 1.8rem;
-    margin-bottom: 1.8rem;
-    border-bottom: 1px solid #000;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    border: 0;
     break-after: page;
     page-break-after: always;
   }
 
   .section,
   .subsection {
-    break-inside: avoid;
-    page-break-inside: avoid;
+    break-inside: auto;
+    page-break-inside: auto;
     padding-bottom: 1.4rem;
     margin-bottom: 1.4rem;
-    break-after: page;
-    page-break-after: always;
   }
 
   img,
@@ -727,5 +794,15 @@ pre code {
   a {
     color: black;
     text-decoration: none;
+  }
+
+  .md-callout,
+  .md-pre,
+  pre,
+  .md-image,
+  .md-table th,
+  .md-table td,
+  .chapter blockquote {
+    box-shadow: none;
   }
 }

@@ -1,5 +1,13 @@
 [
   "docs/black-box-testing/boundary-value-analysis/exercise-1/index.mdx",
   "docs/black-box-testing/equivalence-partitioning/exercise-1/index.mdx",
-  "docs/test-automation/locator-strategy/exercise-1/index.mdx"
+  "docs/black-box-testing/decision-table-testing/exercise-1/index.mdx",
+  "docs/black-box-testing/state-transition-testing/exercise-1/index.mdx",
+  "docs/test-automation/locator-strategy/exercise-1/index.mdx",
+  "docs/test-automation/page-object-model/exercise-1/index.mdx",
+  "docs/test-automation/wait-strategies/exercise-1/index.mdx",
+  "docs/performance-testing/load-modeling/exercise-1/index.mdx",
+  "docs/performance-testing/baseline-metrics/exercise-1/index.mdx",
+  "docs/api-testing/status-and-contracts/exercise-1/index.mdx",
+  "docs/api-testing/negative-cases/exercise-1/index.mdx"
 ]

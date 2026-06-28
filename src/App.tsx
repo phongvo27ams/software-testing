@@ -197,32 +197,38 @@ function App() {
     <div className="book-shell">
       <header className="book-cover" id="top">
         <div className="cover-topline">
-          <div className="cover-badge">Printed Edition</div>
-          <span className="cover-edition">Volume I</span>
+          <div className="cover-badge">Professional Edition</div>
+          <span className="cover-edition">Software Quality Series</span>
         </div>
         <div className="cover-grid">
           <div className="cover-main">
-            <p className="cover-kicker">Markdown · MDX · PDF</p>
-            <h1>Markdown Book</h1>
+            <p className="cover-kicker">Software Engineering · Testing Practice · Reference</p>
+            <p className="cover-overline">A practical handbook for systematic quality assurance</p>
+            <h1>Software Testing</h1>
             <p className="cover-subtitle">
-              A multi-page writing workspace for long-form documentation, reading, and PDF export.
+              A structured field guide to black-box techniques, automation strategy, performance analysis,
+              and API validation for modern software teams.
             </p>
+            <div className="cover-author-block">
+              <span className="cover-author-label">Author</span>
+              <p className="cover-author-name">Phong Vo</p>
+            </div>
           </div>
           <aside className="cover-aside">
             <div className="cover-panel">
-              <p className="cover-panel-label">Edition Notes</p>
+              <p className="cover-panel-label">In This Edition</p>
               <ul>
-                <li>Single continuous reading page</li>
-                <li>MDX files live in <code>docs/</code></li>
-                <li>Print view matches the full page flow</li>
+                <li>Black-box testing patterns and analysis models</li>
+                <li>Automation design, locator strategy, and wait handling</li>
+                <li>Performance and API testing study chapters</li>
               </ul>
             </div>
           </aside>
         </div>
         <div className="cover-meta">
-          <span>Static local preview</span>
-          <span>Single-page book flow</span>
-          <span>Ready for PDF export</span>
+          <span>Single-page book edition</span>
+          <span>Print-ready PDF layout</span>
+          <span>Built from Markdown and MDX</span>
         </div>
         <div className="cover-actions">
           <button className="primary" onClick={() => window.print()}>
