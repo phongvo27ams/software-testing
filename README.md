@@ -37,7 +37,7 @@ Key directories and files:
 
 - `docs/`
   Contains all book content. Each document is an `index.mdx` file inside a chapter/section/subsection folder structure.
-- `book-order.json`
+- `index.json`
   Controls the exact render order of documents in the final book.
 - `src/App.tsx`
   Builds the cover, contents, and continuous document flow.
@@ -56,14 +56,14 @@ docs/black-box-testing/boundary-value-analysis/exercise-1/index.mdx
 
 ## How Content Works
 
-Each `index.mdx` file becomes one section in the final single-page book. The app reads every file listed in `book-order.json`, extracts headings, builds the contents tree, and renders the documents in that exact order.
+Each `index.mdx` file becomes one section in the final single-page book. The app reads every file listed in `index.json`, extracts headings, builds the contents tree, and renders the documents in that exact order.
 
-If you want to reorder the book, edit `book-order.json`.
+If you want to reorder the book, edit `index.json`.
 
 If you want to add a new page:
 
 1. Create a new `index.mdx` file under `docs/`.
-2. Add its path to `book-order.json`.
+2. Add its path to `index.json`.
 3. Restart the dev server if needed.
 
 ## Install Dependencies

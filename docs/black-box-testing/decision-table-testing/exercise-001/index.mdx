@@ -1,0 +1,112 @@
+## Decision Table Testing
+
+### Exercise: Online Library Borrowing Rules
+
+An online library system allows a user to borrow a book only when all of the following conditions are satisfied:
+
+- The user has an active account.
+- The user has no overdue books.
+- The user has not exceeded the allowed borrowing limit.
+
+Additional rules:
+
+- A `VIP` member may borrow up to `10` books.
+- A `Non-VIP` member may borrow up to `5` books.
+
+#### Question
+
+Using Decision Table Testing, build a decision table for the rules above and design the corresponding test cases.
+
+Your answer should:
+
+- Identify the main conditions and actions.
+- Present a reduced decision table.
+- Derive the test cases from the decision table.
+- Explain whether the problem contains any impossible rule.
+
+:::tip
+Separate the problem into two parts:
+
+- First, identify the business conditions that directly affect the final decision.
+- Then, decide whether some inputs are only intermediate logic.
+
+In this exercise, the member type does affect the borrowing limit, but the final borrow decision is already reflected by the condition "current borrowed books exceeded the limit or not". That is why the reduced decision table can stay compact while the test cases still verify both VIP and Non-VIP scenarios.
+:::
+
+#### Sample Answer
+
+We first identify the business conditions:
+
+- `C1`: Is the account active?
+- `C2`: Does the user have overdue books?
+- `C3`: Is the user a VIP member?
+- `C4`: Has the user already reached or exceeded the borrowing limit?
+
+The actions are:
+
+- `A1`: Allow borrowing
+- `A2`: Reject borrowing
+- `A3`: Display the rejection reason
+
+The main rules are:
+
+- If `C1 = No`, reject borrowing.
+- If `C2 = Yes`, reject borrowing.
+- If `C4 = Yes`, reject borrowing.
+- Only when `C1 = Yes`, `C2 = No`, and `C4 = No`, the system allows borrowing.
+- `C3` is used to determine whether the limit is `5` or `10`, but the final borrow decision is already captured by `C4`.
+
+##### Reduced decision table
+
+| Rule | R1 | R2 | R3 | R4 |
+|---|---|---|---|---|
+| C1. Account active? | N | Y | Y | Y |
+| C2. Overdue books? | - | Y | N | N |
+| C4. Exceeded limit? | - | - | Y | N |
+| A1. Allow borrowing | N | N | N | Y |
+| A2. Reject borrowing | Y | Y | Y | N |
+| A3. Rejection reason | Account inactive | Overdue books exist | Borrowing limit exceeded | - |
+
+This reduced table has four core rules:
+
+- `R1`: Reject because the account is inactive.
+- `R2`: Reject because the user has overdue books.
+- `R3`: Reject because the borrowing limit has been reached or exceeded.
+- `R4`: Allow borrowing.
+
+##### Test cases derived from the decision table
+
+| Test case | C1 | C2 | C3 | Current borrowed books | Limit | Expected result |
+|---|---|---|---|---:|---:|---|
+| TC-001 | No | No | Non-VIP | 0 | 5 | Reject, show "account inactive" |
+| TC-002 | Yes | Yes | Non-VIP | 2 | 5 | Reject, show "overdue books exist" |
+| TC-003 | Yes | No | Non-VIP | 5 | 5 | Reject, show "borrowing limit exceeded" |
+| TC-004 | Yes | No | VIP | 9 | 10 | Allow borrowing |
+
+The four test cases above are enough to cover the four reduced rules.
+
+##### Additional tests for VIP and Non-VIP limits
+
+Because `C3` affects how `C4` is evaluated, the practical test set should also verify the two different borrowing limits:
+
+| Test case | Member type | Current borrowed books | Expected result |
+|---|---|---:|---|
+| TC-005 | Non-VIP | 4 | Allow borrowing |
+| TC-006 | Non-VIP | 5 | Reject because the limit has been reached |
+| TC-007 | VIP | 9 | Allow borrowing |
+| TC-008 | VIP | 10 | Reject because the limit has been reached |
+
+So, the reduced decision table needs only `4` core test cases, but a more complete practical test suite should contain `8` test cases to verify both limit policies correctly.
+
+##### Impossible rule analysis
+
+This exercise does **not** contain an impossible rule.
+
+The reason is that `C1`, `C2`, `C3`, and `C4` can be treated as logically independent conditions in the decision table. There is no pair of conditions that directly contradicts each other.
+
+An impossible rule appears when two or more conditions cannot be true at the same time because of a business constraint. For example:
+
+- `C1`: The person is a student.
+- `C2`: The person is a lecturer.
+
+If the business rule says that one person cannot be both a student and a lecturer at the same time, then the combination `C1 = Yes` and `C2 = Yes` would be an impossible rule.

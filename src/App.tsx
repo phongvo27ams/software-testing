@@ -1,6 +1,6 @@
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { MarkdownRenderer } from './markdownRenderer';
-import bookOrder from '../book-order.json';
+import contentIndex from '../index.json';
 
 type DocRecord = {
   path: string;
@@ -75,7 +75,7 @@ function extractHeadings(content: string) {
   return headings;
 }
 
-const orderedDocs: DocRecord[] = (bookOrder as string[])
+const orderedDocs: DocRecord[] = (contentIndex as string[])
   .map((path) => docsByPath.get(path))
   .filter((doc): doc is { path: string; content: string } => Boolean(doc))
   .map((doc) => ({
