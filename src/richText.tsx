@@ -22,12 +22,20 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
-function headingRenderer(level: 1 | 2 | 3, idPrefix = '') {
+type HeadingLabelMap = Record<string, string>;
+
+function headingRenderer(level: 1 | 2 | 3, options: { idPrefix?: string; labels?: HeadingLabelMap } = {}) {
+  const { idPrefix = '', labels } = options;
+
   return function Heading({ children, ...props }: { children?: React.ReactNode }) {
     const text = Array.isArray(children) ? children.join(' ') : String(children ?? '');
     const Tag = `h${level}` as const;
+    const slug = slugify(text);
+    const numberLabel = labels?.[slug] ?? '';
+
     return (
-      <Tag {...props} id={`${idPrefix}${slugify(text)}`}>
+      <Tag {...props} id={`${idPrefix}${slug}`}>
+        {numberLabel ? <span className="heading-number">{numberLabel}</span> : null}
         {children}
       </Tag>
     );
@@ -64,7 +72,15 @@ function parseAdmonitions(value: string) {
   return output.join('\n');
 }
 
-export function RichText({ value, idPrefix = '' }: { value: string; idPrefix?: string }) {
+export function RichText({
+  value,
+  idPrefix = '',
+  labels,
+}: {
+  value: string;
+  idPrefix?: string;
+  labels?: HeadingLabelMap;
+}) {
   const calloutTypes = {
     note: {
       label: 'NOTE',
@@ -116,9 +132,9 @@ export function RichText({ value, idPrefix = '' }: { value: string; idPrefix?: s
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
       components={{
-        h1: headingRenderer(1, idPrefix),
-        h2: headingRenderer(2, idPrefix),
-        h3: headingRenderer(3, idPrefix),
+        h1: headingRenderer(1, { idPrefix, labels }),
+        h2: headingRenderer(2, { idPrefix, labels }),
+        h3: headingRenderer(3, { idPrefix, labels }),
         p: ({ ...props }) => <p className="md-paragraph" {...props} />,
         pre: ({ ...props }) => <pre className="md-pre" {...props} />,
         img: ({ ...props }) => <img className="md-image" alt="" {...props} />,

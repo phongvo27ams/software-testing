@@ -20,6 +20,22 @@ type HeadingRecord = {
   level: number;
 };
 
+type HeadingCounters = {
+  h1: number;
+  h2: number;
+  h3: number;
+};
+
+type HeadingLabelMap = Record<string, string>;
+
+type DocOutline = {
+  anchor: string;
+  title: string;
+  labels: HeadingLabelMap;
+  toc: TocItem;
+  rootNumber: string;
+};
+
 const rawDocs = import.meta.glob('../docs/**/*.mdx', {
   eager: true,
   query: '?raw',
@@ -59,39 +75,83 @@ function extractHeadings(content: string) {
   return headings;
 }
 
-function docTitleFromContent(doc: DocRecord, fallbackIndex: number) {
-  const headings = extractHeadings(doc.content);
-  const firstHeading = headings.find((heading) => heading.level === 1) ?? headings[0];
-  return firstHeading?.text ?? `Document ${fallbackIndex + 1}`;
-}
+const orderedDocs: DocRecord[] = (bookOrder as string[])
+  .map((path) => docsByPath.get(path))
+  .filter((doc): doc is { path: string; content: string } => Boolean(doc))
+  .map((doc) => ({
+    path: doc.path,
+    content: doc.content,
+  }));
 
-function docAnchorFromContent(doc: DocRecord, fallbackIndex: number) {
-  const headings = extractHeadings(doc.content);
-  const firstHeading = headings.find((heading) => heading.level === 1) ?? headings[0];
-  return firstHeading?.id ?? `document-${fallbackIndex + 1}`;
-}
-
-function buildTocItems(doc: DocRecord, index: number): TocItem {
+function buildDocOutline(doc: DocRecord, index: number, globalState: HeadingCounters): DocOutline {
   const headings = extractHeadings(doc.content).filter((heading) => heading.level >= 1 && heading.level <= 3);
-  const rootHeading = headings.find((heading) => heading.level === 1) ?? headings[0];
-  const docAnchor = docAnchorFromContent(doc, index);
+  const firstHeading = headings[0];
+  const anchor = firstHeading?.id ?? `document-${index + 1}`;
+  const labels: HeadingLabelMap = {};
+  let chapter = globalState.h1;
+  let section = globalState.h2;
+  let subsection = globalState.h3;
+  let rootNumber = '1';
+
+  if (firstHeading?.level === 1) {
+    chapter += 1;
+    section = 0;
+    subsection = 0;
+    rootNumber = `${chapter}`;
+  } else if (firstHeading?.level === 2) {
+    if (chapter === 0) chapter = 1;
+    section += 1;
+    subsection = 0;
+    rootNumber = `${chapter}.${section}`;
+  } else if (firstHeading?.level === 3) {
+    if (chapter === 0) chapter = 1;
+    if (section === 0) section = 1;
+    subsection += 1;
+    rootNumber = `${chapter}.${section}.${subsection}`;
+  }
+
+  const rootLevel = firstHeading?.level ?? 1;
   const root: TocItem = {
-    id: docAnchor,
-    text: docTitleFromContent(doc, index),
-    level: 1,
+    id: anchor,
+    text: `${rootNumber} ${firstHeading?.text ?? `Document ${index + 1}`}`,
+    level: rootLevel,
     children: [],
   };
-
   const stack: TocItem[] = [root];
 
+  let localChapter = chapter;
+  let localSection = section;
+  let localSubsection = subsection;
+
   for (const heading of headings) {
-    if (rootHeading && heading.id === rootHeading.id && heading.level === rootHeading.level) {
+    if (heading === firstHeading) {
+      labels[heading.id] = rootNumber;
       continue;
     }
 
+    if (heading.level === 1) {
+      chapter += 1;
+      section = 0;
+      subsection = 0;
+      localChapter = chapter;
+      localSection = 0;
+      localSubsection = 0;
+      labels[heading.id] = `${localChapter}`;
+    } else if (heading.level === 2) {
+      section += 1;
+      subsection = 0;
+      localSection = section;
+      localSubsection = 0;
+      labels[heading.id] = `${localChapter}.${localSection}`;
+    } else if (heading.level === 3) {
+      subsection += 1;
+      localSubsection = subsection;
+      labels[heading.id] = `${localChapter}.${localSection}.${localSubsection}`;
+    }
+
     const item: TocItem = {
-      id: `${docAnchor}-${heading.id}`,
-      text: heading.text,
+      id: `${anchor}-${heading.id}`,
+      text: `${labels[heading.id]} ${heading.text}`,
       level: heading.level,
       children: [],
     };
@@ -104,24 +164,25 @@ function buildTocItems(doc: DocRecord, index: number): TocItem {
     stack.push(item);
   }
 
-  return root;
-}
+  globalState.h1 = chapter;
+  globalState.h2 = section;
+  globalState.h3 = subsection;
 
-const orderedDocs: DocRecord[] = (bookOrder as string[])
-  .map((path) => docsByPath.get(path))
-  .filter((doc): doc is { path: string; content: string } => Boolean(doc))
-  .map((doc) => ({
-    path: doc.path,
-    content: doc.content,
-  }));
-
-function docLabel(index: number) {
-  return `CHAPTER ${index + 1}`;
+  return {
+    anchor,
+    title: firstHeading?.text ?? `Document ${index + 1}`,
+    labels,
+    toc: root,
+    rootNumber,
+  };
 }
 
 function App() {
   const docs = useMemo(() => orderedDocs, []);
-  const toc = useMemo(() => docs.map((doc, index) => buildTocItems(doc, index)), [docs]);
+  const outlines = useMemo(() => {
+    const state: HeadingCounters = { h1: 0, h2: 0, h3: 0 };
+    return docs.map((doc, index) => buildDocOutline(doc, index, state));
+  }, [docs]);
 
   function renderTocItem(item: TocItem) {
     return (
@@ -176,26 +237,24 @@ function App() {
       <main className="book-content">
         <section className="contents-section" id="contents">
           <div className="contents-heading">
-            <p className="chapter-index">Contents</p>
             <h2>Contents</h2>
           </div>
           <div className="contents-tree">
             <ol>
-              {toc.map(renderTocItem)}
+              {outlines.map((outline) => renderTocItem(outline.toc))}
             </ol>
           </div>
         </section>
 
         <div className="book-article">
           {docs.map((doc, index) => {
-            const docAnchor = docAnchorFromContent(doc, index);
-            const docId = `${docAnchor}-`;
+            const outline = outlines[index];
+            const docId = `${outline.anchor}-`;
 
             return (
-              <section className="chapter" id={docAnchor} key={doc.path}>
-                <p className="chapter-index">{docLabel(index)}</p>
+              <section className="chapter" id={outline.anchor} key={doc.path}>
                 <div className="chapter-body doc-page">
-                  <RichText value={doc.content} idPrefix={docId} />
+                  <RichText value={doc.content} idPrefix={docId} labels={outline.labels} />
                 </div>
               </section>
             );

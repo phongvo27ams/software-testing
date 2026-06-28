@@ -310,7 +310,8 @@ img {
 
 .contents-tree ol {
   margin: 0;
-  padding-left: 1.15rem;
+  padding-left: 0;
+  list-style: none;
 }
 
 .contents-tree li {
@@ -323,6 +324,11 @@ img {
 
 .contents-tree .toc-level-1 > a {
   font-weight: 700;
+}
+
+.contents-tree .toc-level-2 > a,
+.contents-tree .toc-level-3 > a {
+  font-weight: 400;
 }
 
 .contents-tree .toc-level-2 {
@@ -393,11 +399,31 @@ p {
   margin-top: 0;
 }
 
+h1,
+h2,
+h3 {
+  padding-left: 0.2rem;
+}
+
 h1 {
   font-size: var(--text-5xl);
   line-height: 1.05;
   margin-top: 2.4rem;
   margin-bottom: 1.1rem;
+}
+
+.heading-number {
+  display: inline-block;
+  margin-right: 0.7rem;
+  font-size: 1em;
+  font-weight: 700;
+  line-height: 1;
+  color: currentColor;
+}
+
+h1 .heading-number {
+  font-size: 3rem;
+  line-height: 0.95;
 }
 
 h2 {
