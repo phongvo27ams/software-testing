@@ -9,6 +9,7 @@ dist/
 coverage/
 
 *.log
+*.err
 *.tsbuildinfo
 
 .DS_Store
