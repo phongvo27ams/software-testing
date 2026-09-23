@@ -801,3 +801,77 @@ Bởi vì C3 ảnh hưởng đến cách đánh giá C4, bộ test case thực t
 Như vậy, Reduced Decision Table chỉ cần 4 test case cốt lõi, nhưng một bộ test case thực tế đầy đủ hơn nên chứa 8 test case để xác minh chính xác cả hai chính sách giới hạn.
 
 Về việc Impossible rule analysis, bài tập này không chứa impossible rule. Lý do là C1, C2, C3, và C4 có thể được coi là các điều kiện độc lập về mặt logic trong decision table. Không có cặp điều kiện nào mâu thuẫn trực tiếp với nhau. Một impossible rule xuất hiện khi hai hoặc nhiều điều kiện không thể cùng đúng tại một thời điểm do ràng buộc nghiệp vụ. Ví dụ: C1: Người đó là sinh viên. C2: Người đó là giảng viên. Nếu quy tắc nghiệp vụ nói rằng một người không thể vừa là sinh viên vừa là giảng viên cùng một lúc, thì kết hợp C1 = Yes và C2 = Yes sẽ là một impossible rule.
+
+# Designing test scenarios and writing test cases
+
+## Check in guest at the hotel
+
+Cho bảng sau về một quy trình check-in khách tại khách sạn. Hãy vẽ sơ đồ Activity Diagram, sau đó thiết kế các Test Scenario và Test Case để kiểm tra quy trình này.
+
+| Mục | Nội dung |
+| --- | --- |
+| Use Case name | Check in guest at the hotel |
+| Assumption | Receptionist has logged in and is at the check-in page. |
+| Basic flow | 1. Receptionist chooses a room type from the list to search.<br>2. System shows the list of available rooms of that room type.<br>3. Receptionist chooses a room from the list of available rooms.<br>4. System shows the detail of the selected room, and the check-in date is the current date.<br>5. Receptionist enters the information of the guest and the expected check-out date and confirms the check-in.<br>6. System checks the information and records the information. |
+| Alternative flow | **Change room:** Before entering guest information in Step 5, receptionist may choose to change the room:<br>- 5A.1. Receptionist chooses another room from the list of other available rooms.<br>Continue at step 4 of the basic flow.<br><br>**Upgrade room:** Before selecting a room in Step 3, receptionist may choose to view available rooms of higher room types:<br>- 3B.1. Receptionist chooses the upgrade button.<br>- 3B.2. System shows the list of available rooms of higher room types, ordered by room type categories.<br>Continue at step 3 of the basic flow.<br><br>**Check-in by reservation:** At Step 1 of the basic flow, when there is possibly a reservation:<br>- 1A.1. Receptionist enters the guest name to search for the reservation.<br>- 1A.2. System shows the page of matched reservations.<br>- 1A.3. Receptionist chooses the correct reservation.<br>- 1A.4. System shows the list of other available rooms of the room type of the booking.<br>Continue at step 3 of the basic flow. |
+| Exception | **No reservation:** After searching reservation using guest name in Step 1A.1, if no reservation is found:<br>- 1A.2.B.1. System shows the page of no reservations.<br>Continue at step 1 of the basic flow.<br><br>**Mis-configure required information:** At Step 6 of the basic flow, when there are violations of required guest information or when the expected check-out date is before the check-in date, the system shows the message: “[data item] misconfigured, please check” and does not continue.<br>The required guest information includes: first name, last name, date of birth, gender, and ID number. |
+
+Activity diagram của quy trình check-in khách tại khách sạn:
+
+![](V0S2AU6.png)
+
+- Với Alternative flow Change room, xảy ra ngay trước bước 5 để khách hàng có thể chọn lại phòng khác, sau đó nối vào flow bước 4 để hệ thống hiển thị lại thông tin chi tiết về phòng đó.
+- Với Alternative flow Upgrade room, tùy theo ngữ cảnh thực tế mà nối flow vào. Ví dụ, sau bước 3B2, nếu nối flow vào sau bước 2: việc upgrade có thể diễn ra nhiều lần. Nếu nối flow vào trước bước 3, việc upgrade chỉ diễn ra một lần như trong sơ đồ đang vẽ.
+- Với Alternative flow Check-in by reservation, xảy ra trước bước 1 khi khách hàng đã có đặt phòng trước. 1A4 cần được nối flow vào sau bước 2, và ngay trước Alternative flow 3B1, để khách hàng có thể thực hiện upgrade. Nếu 1A4 được nối flow vào sau Alternative flow 3B1, khách hàng không thể upgrade.
+- Với Exception No reservation, xảy ra ngày sau 1A1, sau đó 1A2B1 cần được nối flow vào Alternative node trước bước 1 để có thể thực hiện từ bước 1, hoặc có thể đi vào flow 1A1 để kiểm tra reservation.
+- Với Exception Mis-configure required information, cần thực hiện trước bước 6. Exception này không được thực thi theo như mô tả “does not continue”, do đó nó cần đi đến điểm kết thúc.
+
+Tiến hành thiết kế các test scenario:
+
+| Test scenario ID | Mô tả | Flow |
+| --- | --- | --- |
+| TS-001 | Happy Path: Check-in trực tiếp thành công | 1, 2, 3, 4, 5, 6 |
+| TS-002 | Check-in by reservation thành công | 1A1, 1A2, 1A3, 1A4, 3, 4, 5, 6 |
+| TS-003 | Không tìm thấy reservation, sau đó check-in trực tiếp | 1A1, 1A2B1, 1, 2, 3, 4, 5, 6 |
+| TS-004 | Upgrade room trước khi chọn phòng | 1, 2, 3B1, 3B2, 3, 4, 5, 6 |
+| TS-005 | Change room trước khi nhập thông tin check-in | 1, 2, 3, 4, 5A1, 4, 5, 6 |
+| TS-006 | Dữ liệu check-in không hợp lệ | 1, 2, 3, 4, 5, ERR |
+
+Bảng Use Case Test Cases tương ứng trực tiếp với 6 Scenario:
+
+| Test Case ID | Mô tả Test Case | Tiền điều kiện | Kỹ thuật | Bước thực hiện | Kết quả mong đợi | Kết quả |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-001-001 | Kiểm tra check-in trực tiếp thành công. | Receptionist đã đăng nhập; có phòng trống. | Use Case Testing | Thực hiện luồng TS-001. | Check-in được ghi nhận thành công. | PASS |
+| TC-002-001 | Kiểm tra check-in bằng reservation thành công. | Tồn tại reservation hợp lệ. | Use Case Testing | Thực hiện luồng TS-002. | Check-in được ghi nhận thành công từ reservation. | PASS |
+| TC-003-001 | Kiểm tra không tìm thấy reservation và chuyển sang check-in trực tiếp. | Không tồn tại reservation phù hợp. | Use Case Testing | Thực hiện luồng TS-003. | Hệ thống hiển thị thông báo không tìm thấy reservation và cho phép check-in trực tiếp. | PASS |
+| TC-004-001 | Kiểm tra nâng hạng phòng trước khi chọn phòng. | Có phòng hạng cao hơn khả dụng. | Use Case Testing | Thực hiện luồng TS-004. | Khách được check-in vào phòng nâng hạng thành công. | PASS |
+| TC-005-001 | Kiểm tra đổi phòng trước khi nhập thông tin khách. | Có phòng khác khả dụng. | Use Case Testing | Thực hiện luồng TS-005. | Thông tin check-in được ghi nhận cho phòng mới. | PASS |
+| TC-006-001 | Kiểm tra dữ liệu không hợp lệ khi check-in. | Có ít nhất một trường bắt buộc không hợp lệ. | Use Case Testing | Thực hiện luồng TS-006. | Hệ thống hiển thị thông báo lỗi và không ghi nhận check-in. | PASS |
+
+Bảng ECP Test Cases áp dụng cho các trường bắt buộc:
+
+| Test Case ID | Mô tả Test Case | Tiền điều kiện | Kỹ thuật | Bước thực hiện | Kết quả mong đợi | Kết quả |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-ECP-001 | Thiếu First Name. | Đang ở Step 5. | ECP | Để trống First Name. | Hiển thị lỗi First Name. | PASS |
+| TC-ECP-002 | Thiếu Last Name. | Đang ở Step 5. | ECP | Để trống Last Name. | Hiển thị lỗi Last Name. | PASS |
+| TC-ECP-003 | Thiếu Date of Birth. | Đang ở Step 5. | ECP | Để trống Date of Birth. | Hiển thị lỗi Date of Birth. | PASS |
+| TC-ECP-004 | Thiếu Gender. | Đang ở Step 5. | ECP | Không chọn Gender. | Hiển thị lỗi Gender. | PASS |
+| TC-ECP-005 | Thiếu ID Number. | Đang ở Step 5. | ECP | Để trống ID Number. | Hiển thị lỗi ID Number. | PASS |
+| TC-ECP-006 | Tất cả dữ liệu hợp lệ. | Đang ở Step 5. | ECP | Nhập đầy đủ dữ liệu. | Hệ thống chấp nhận dữ liệu. | PASS |
+
+Bảng BVA Test Cases áp dụng cho Expected Check-out Date:
+
+| Test Case ID | Mô tả Test Case | Tiền điều kiện | Kỹ thuật | Bước thực hiện | Kết quả mong đợi | Kết quả |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-BVA-001 | Check-out date nhỏ hơn check-in date. | Check-in date = 04/06/2026. | BVA | Nhập check-out date = 03/06/2026. | Hệ thống báo lỗi. | PASS |
+| TC-BVA-002 | Check-out date bằng check-in date. | Check-in date = 04/06/2026. | BVA | Nhập check-out date = 04/06/2026. | Xác nhận theo yêu cầu nghiệp vụ. | PASS |
+| TC-BVA-003 | Check-out date lớn hơn check-in date một ngày. | Check-in date = 04/06/2026. | BVA | Nhập check-out date = 05/06/2026. | Hệ thống chấp nhận dữ liệu. | PASS |
+
+Bảng Decision Table Test Cases với các điều kiện: First Name, Last Name, DOB, Gender, ID Number, Check-out Date hợp lệ:
+
+| Test Case ID | Mô tả Test Case | Tiền điều kiện | Kỹ thuật | Bước thực hiện | Kết quả mong đợi | Kết quả |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-DT-001 | Thiếu First Name. | Đang ở Step 5. | Decision Table | Nhập dữ liệu theo Rule 1. | Hiển thị lỗi First Name. | PASS |
+| TC-DT-002 | Thiếu ID Number. | Đang ở Step 5. | Decision Table | Nhập dữ liệu theo Rule 5. | Hiển thị lỗi ID Number. | PASS |
+| TC-DT-003 | Check-out date không hợp lệ. | Đang ở Step 5. | Decision Table | Nhập dữ liệu theo Rule 6. | Hiển thị lỗi Check-out Date. | PASS |
+| TC-DT-004 | Tất cả điều kiện hợp lệ. | Đang ở Step 5. | Decision Table | Nhập dữ liệu theo Rule 7. | Hệ thống ghi nhận check-in. | PASS |
