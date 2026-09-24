@@ -1,10 +1,14 @@
 # SOFTWARE TESTING
 
-# Black Box Testing
+---
 
-## Boundary Value Analysis
+# Test Design Techniques
 
-### Room Booking Validation
+## Black Box Testing
+
+### Boundary Value Analysis
+
+#### Room Booking Validation
 
 Hệ thống đặt phòng của một trường đại học cho phép người dùng đăng ký đặt phòng bằng cách nhập các dữ liệu sau:
 
@@ -211,7 +215,7 @@ Nếu chỉ dùng Normal BVA, ta không kiểm tra dữ liệu ngoài biên như
 
 Vì vậy, với giả định hai trường được validation độc lập, Robust BVA là lựa chọn cân bằng nhất: chỉ cần 13 test case nhưng vẫn kiểm tra được cả biên hợp lệ và biên không hợp lệ. Đây là kỹ thuật vừa đủ mạnh để bắt lỗi validation ở biên, vừa không làm số lượng test case tăng quá nhiều. Nếu hai trường có ràng buộc tương tác, cần bổ sung các tổ hợp liên quan hoặc dùng Worst-case/Robust Worst-case.
 
-### Seminar Registration System
+#### Seminar Registration System
 
 Hệ thống đăng ký hội thảo học thuật của một trường đại học cho phép người dùng nhập các thông tin sau:
 
@@ -400,9 +404,9 @@ Thiết kế test case:
 | ... | ... | ... | ... | ... | ... |
 | TC-2401 | 66 | 41 | 181 | 11 | Error: invalid `Age`, `Experience`, `Registration Days Before Event`, `Number of Workshops` |
 
-## Equivalence Partitioning
+### Equivalence Partitioning
 
-### Movie Ticket Booking
+#### Movie Ticket Booking
 
 Một hệ thống đặt vé xem phim cho phép khách hàng đặt vé bằng cách nhập hai thông tin:
 
@@ -533,7 +537,7 @@ Thiết kế test case:
 
 Với tình huống bài tập đặt vé xem phim ở trên, kỹ thuật tối ưu nhất thường là Weak Robust ECP. Lý do là bài có cả dữ liệu hợp lệ và không hợp lệ: tuổi < 6, tuổi > 80, không chọn seat, chọn sai seat. Vì vậy nếu chỉ dùng Normal ECP thì chưa đủ tốt, vì nó bỏ qua các trường hợp lỗi. Tuy nhiên nếu dùng Strong Robust ECP thì quá nhiều test case: 20 test cases. Cách này phủ rất kỹ nhưng không tối ưu về thời gian, nhất là khi đây chỉ là bài toán có logic nhập liệu đơn giản.
 
-### Smart Locker System
+#### Smart Locker System
 
 Một hệ thống tủ gửi đồ tự động thông minh trong trường đại học cho phép sinh viên đặt tủ bằng cách nhập hai thông tin sau:
 
@@ -638,7 +642,7 @@ $$
 
 Đối với bài toán Smart Locker System, kỹ thuật Weak Robust ECP là lựa chọn tối ưu nhất. Lý do bài toán có quy định cụ thể về các giá trị không hợp lệ (nhập ngoài khoảng thời gian, không chọn tủ hoặc nhập sai ký tự). Dùng Normal ECP sẽ bỏ sót các trường hợp kiểm thử lỗi, trong khi Strong Robust ECP sinh ra quá nhiều test case (20 test cases) dẫn đến tốn kém thời gian không cần thiết cho một hệ thống nhập liệu đơn giản.
 
-### Smart Loan System
+#### Smart Loan System
 
 Một ứng dụng ngân hàng số cho phép khách hàng đăng ký khoản vay tín chấp trực tuyến. Hệ thống yêu cầu người dùng nhập 3 thông tin đầu vào chính để duyệt tự động:
 
@@ -764,9 +768,9 @@ Trong bài này, `Employment Type = F` là dữ liệu đầu vào hợp lệ v�
 
 Với các test Strong Robust chứa nhiều đầu vào không hợp lệ, đề bài chưa quy định hệ thống hiển thị lỗi đầu tiên hay tất cả lỗi. Các expected result liệt kê nhiều lỗi ở trên dựa trên giả định hệ thống hiển thị đồng thời tất cả lỗi; nếu hệ thống dùng cơ chế first-error thì phải điều chỉnh oracle theo thứ tự ưu tiên thực tế.
 
-## Decision Table Testing
+### Decision Table Testing
 
-### Online Library Borrowing Rules
+#### Online Library Borrowing Rules
 
 Một thư viện trực tuyến cho phép người dùng mượn sách chỉ khi đáp ứng tất cả các điều kiện sau:
 - Người dùng có tài khoản hoạt động (active account).
@@ -840,9 +844,9 @@ Như vậy, Reduced Decision Table chỉ cần 4 test case cốt lõi, nhưng m�
 
 Về Impossible rule analysis, bảng rút gọn trên không chứa impossible rule vì C4 được coi là điều kiện dẫn xuất đã tính sẵn và mọi giá trị True/False của nó đều có thể xảy ra với cả VIP và Non-VIP khi số sách hiện tại thay đổi. Tuy nhiên, C4 không hoàn toàn độc lập: nó được tính từ loại thành viên, số sách đang mượn và giới hạn tương ứng. Nếu một decision table chi tiết đồng thời chứa `Member type`, `Current borrowed books`, `Limit` và `Exceeded limit?`, các tổ hợp không nhất quán như Non-VIP nhưng `Limit = 10` sẽ là impossible rule và phải được loại bỏ.
 
-# Designing test scenarios and writing test cases
+### Use Case Testing
 
-## Check in guest at the hotel
+#### Hotel Guest Check-in
 
 Cho bảng sau về một quy trình check-in khách tại khách sạn. Hãy vẽ sơ đồ Activity Diagram, sau đó thiết kế các Test Scenario và Test Case để kiểm tra quy trình này.
 
