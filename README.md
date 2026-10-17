@@ -28,6 +28,8 @@ Giả định các giá trị danh nghĩa (nominal values) như sau:
 
 Sử dụng Boundary Value Analysis (BVA), hãy thiết kế các tập test case cho hệ thống trên bằng cách áp dụng lần lượt bốn phương pháp sau: Normal BVA, Robust BVA, Worst-case BVA, và Robust Worst-case BVA. Đối với mỗi phương pháp, hãy giải thích cách tính số lượng test case được tạo ra, xác định các giá trị kiểm thử (test values) được chọn cho mỗi biến, và trình bày các test case dưới dạng bảng.
 
+Giả định cả hai trường `Duration` và `Number of Students` đều là số nguyên. Hệ thống không chấp nhận giá trị thập phân, ký tự hoặc dữ liệu không đúng định dạng. Các test case trong bài tập tập trung vào kiểm thử ranh giới của miền giá trị số nguyên.
+
 **Lời giải chi tiết**
 
 Để thiết kế BVA test set, trước tiên ta cần xác định các phạm vi hợp lệ, giá trị danh nghĩa, và sau đó sinh ra các giá trị biên cho từng biến đầu vào. Có 2 biến đầu vào:
@@ -209,7 +211,7 @@ Thiết kế bảng test case:
 | TC-048 | 181 | 50 | Error: invalid `Duration` |
 | TC-049 | 181 | 51 | Error: invalid `Duration` and `Number of Students` |
 
-Kỹ thuật tối ưu trong dạng bài tập này thường là Robust BVA. Lý do là bài có 2 input dạng số, mỗi input đều có miền hợp lệ rõ ràng. Các lỗi thường xuất hiện ở ngay sát biên.
+Với giả định hai trường dữ liệu được kiểm tra độc lập và mục tiêu chủ yếu là phát hiện lỗi validation tại các giá trị biên, Robust BVA là lựa chọn hiệu quả về số lượng test case và phạm vi kiểm thử. Tuy nhiên, kỹ thuật này không bảo đảm phát hiện các lỗi phát sinh từ tương tác giữa nhiều đầu vào.
 
 Nếu chỉ dùng Normal BVA, ta không kiểm tra dữ liệu ngoài biên như 29, 181, 0, 51, nên chưa đủ tốt cho validation. Nếu dùng Worst-case BVA, ta có 25 test case, nhưng vẫn không kiểm tra invalid. Nếu dùng Robust Worst-case BVA, ta có 49 test case. Độ phủ cao nhất, nhưng khá tốn công và nhiều trường hợp có thể dư thừa nếu `Duration` và Students được validate độc lập.
 
@@ -412,7 +414,7 @@ Một hệ thống đặt vé xem phim cho phép khách hàng đặt vé bằng 
 
 | Data field | Description | Valid range |
 | --- | --- | --- |
-| `Age` | Tuổi của khách hàng | Child, Adult, Senior |
+| `Age` | Tuổi của khách hàng | 6-80 |
 | `Seat type` | Loại ghế được chọn bởi khách hàng | S, P |
 
 Hệ thống phải kiểm tra tính hợp lệ của dữ liệu đầu vào theo các quy tắc sau:
@@ -451,7 +453,7 @@ Sử dụng Equivalence Class Partitioning (ECP), hãy thiết kế các tập t
 | `Seat type` | EC6 | S | Valid: Standard |
 | `Seat type` | EC7 | P | Valid: Premium |
 | `Seat type` | EC8 | Blank | Invalid |
-| `Seat type` | EC9 | X | Invalid |
+| `Seat type` | EC9 | Any value other than S, P or Blank | Invalid |
 
 Giả định `Age` là trường bắt buộc và chỉ nhận số nguyên. Nếu giao diện cho phép nhập Blank, ký tự hoặc số thập phân thì cần bổ sung các lớp không hợp lệ tương ứng.
 
@@ -547,14 +549,14 @@ Một hệ thống tủ gửi đồ tự động thông minh trong trường đ�
 | `Locker size` | Loại tủ được chọn bởi người dùng | S, L, X |
 
 Hệ thống kiểm tra tính hợp lệ và xử lý tính phí theo các quy tắc:
-- Thời gian gửi đồ (`Duration`):
-- Từ 1 đến dưới 30 phút: Miễn phí (0 USD).
-- Từ 30 đến 120 phút: Phí cơ bản 1 USD.
-- Nhỏ hơn 1 phút hoặc lớn hơn 120 phút: Không hợp lệ.
+- Thời gian gửi đồ (`Duration`): chỉ nhận số nguyên tính bằng phút.
+  - Từ 1 đến dưới 30 phút: Miễn phí (0 USD).
+  - Từ 30 đến 120 phút: Phí cơ bản 1 USD.
+  - Nhỏ hơn 1 phút hoặc lớn hơn 120 phút: Không hợp lệ.
 - Loại tủ (`Locker size`):
-- Tủ nhỏ (S): Phụ phí +0 USD.
-- Tủ lớn (L): Phụ phí +1 USD.
-- Tủ cực lớn (X): Phụ phí +1.5 USD.
+  - Tủ nhỏ (S): Phụ phí +0 USD.
+  - Tủ lớn (L): Phụ phí +1 USD.
+  - Tủ cực lớn (X): Phụ phí +1.5 USD.
 
 Nếu không chọn kích thước tủ hoặc nhập giá trị khác ngoài S, L, X: Không hợp lệ. Yêu cầu đặt tủ chỉ thành công khi cả `Duration` và `Locker size` đều hợp lệ. Khi vi phạm bất kỳ điều kiện nào, hệ thống hiển thị trạng thái lỗi và phát ra tiếng bíp.
 
@@ -577,7 +579,7 @@ Sử dụng kỹ thuật Equivalence Partitioning (ECP), hãy thiết kế các 
 | `Locker size` | EC6 | L | Valid: Large |
 | `Locker size` | EC7 | X | Valid: Extra Large |
 | `Locker size` | EC8 | Blank | Invalid: Missing |
-| `Locker size` | EC9 | Y | Invalid: Other character |
+| `Locker size` | EC9 | Any value other than S, L, X or Blank | Invalid: Other character |
 
 Đối với Weak Normal ECP, ta chọn một đại diện từ mỗi lớp hợp lệ và đảm bảo mọi lớp hợp lệ đều xuất hiện ít nhất một lần: EC1, EC2, EC5, EC6, EC7.
 
@@ -640,7 +642,7 @@ $$
 | TC-006 | 150 | K | Invalid: `Duration` > 120 & Invalid size, Beep |
 | ... | ... | ... | ... |
 
-Đối với bài toán Smart Locker System, kỹ thuật Weak Robust ECP là lựa chọn tối ưu nhất. Lý do bài toán có quy định cụ thể về các giá trị không hợp lệ (nhập ngoài khoảng thời gian, không chọn tủ hoặc nhập sai ký tự). Dùng Normal ECP sẽ bỏ sót các trường hợp kiểm thử lỗi, trong khi Strong Robust ECP sinh ra quá nhiều test case (20 test cases) dẫn đến tốn kém thời gian không cần thiết cho một hệ thống nhập liệu đơn giản.
+Đối với bài toán Smart Locker System, kỹ thuật Weak Robust ECP phù hợp để kiểm tra các lớp đầu vào hợp lệ và không hợp lệ với số lượng test case nhỏ. Tuy nhiên, do phí gửi đồ phụ thuộc đồng thời vào Duration và Locker size, nên kết hợp Strong Normal ECP để kiểm tra đầy đủ 6 tổ hợp tính phí, đồng thời bổ sung các test case không hợp lệ từ Weak Robust ECP.
 
 #### Smart Loan System
 
@@ -648,7 +650,7 @@ Một ứng dụng ngân hàng số cho phép khách hàng đăng ký khoản va
 
 | Data field | Description | Valid range |
 | --- | --- | --- |
-| `Credit Score` | Điểm tín dụng CIC của khách hàng | 300 ≤ `Credit Score` ≤ 850 |
+| `Credit Score` | Điểm tín dụng của khách hàng | 300 ≤ `Credit Score` ≤ 850 |
 | `Monthly Income` | Thu nhập hàng tháng (đơn vị: triệu VNĐ) | 10 ≤ `Monthly Income` ≤ 200 |
 | `Employment Type` | Form hợp đồng lao động | Permanent (P), Contract (C), Freelance (F) |
 
@@ -673,7 +675,7 @@ Quy tắc xử lý và phê duyệt của hệ thống như sau:
 
 4. Ràng buộc kết hợp (Logic phê duyệt khoản vay):
 - Hồ sơ Duyệt thành công (Approved) khi cả 3 trường đều đúng định dạng, `Employment Type` là P hoặc C, đồng thời không rơi vào trường hợp (`Credit Score` thuộc nhóm Weak VÀ `Monthly Income` thuộc nhóm Tier 1).
-- Hồ sơ Bị từ chối (Rejected) nếu nhập `Employment Type` là F, hoặc rơi vào trường hợp kết hợp lỗi (`Credit Score` Weak VÀ `Monthly Income` Tier 1).
+- Hồ sơ bị từ chối theo quy tắc nghiệp vụ nếu `Employment Type` là F, hoặc nếu Credit Score thuộc nhóm Weak và Monthly Income thuộc Tier 1, mặc dù cả hai giá trị đầu vào đều hợp lệ.
 - Hệ thống hiển thị Thông báo lỗi (Error) nếu có bất kỳ trường nào có dữ liệu không hợp lệ (out of range/invalid character/blank).
 
 **Lời giải chi tiết**
@@ -695,7 +697,7 @@ Quy tắc xử lý và phê duyệt của hệ thống như sau:
 | `Employment Type` | EC11 | C | Valid: Contract |
 | `Employment Type` | EC12 | F | Valid: Freelance (Logic Reject) |
 | `Employment Type` | EC13 | Blank | Invalid: Missing |
-| `Employment Type` | EC14 | K | Invalid: Other character |
+| `Employment Type` | EC14 | Any value other than P, C, F or Blank | Invalid: Other character |
 
 Đối với Weak Normal ECP, ta chọn một đại diện từ mỗi lớp hợp lệ và đảm bảo mọi lớp hợp lệ đều xuất hiện ít nhất một lần: EC1–EC3, EC6–EC7, EC10–EC12. Số lượng test case: Biến `Credit Score` và `Employment Type` có số lớp hợp lệ lớn nhất (3 lớp), nên số lượng test case tối thiểu là 3.
 
@@ -776,6 +778,7 @@ Một thư viện trực tuyến cho phép người dùng mượn sách chỉ kh
 - Người dùng có tài khoản hoạt động (active account).
 - Người dùng không có sách quá hạn (overdue books).
 - Người dùng chưa vượt quá giới hạn mượn sách cho phép.
+- Giả định rằng mỗi yêu cầu chỉ mượn thêm một cuốn sách.
 
 Các quy tắc bổ sung:
 - Thành viên VIP có thể mượn tối đa 10 cuốn sách.
@@ -794,12 +797,12 @@ Trước tiên, ta cần xác định các business conditions:
 - C2: Người dùng có sách quá hạn không?
 - C3: Người dùng có phải là thành viên VIP không?
 - C4: Người dùng đã đạt đến hoặc vượt quá giới hạn mượn sách chưa? Các actions là:
-- A1: Cho phép mượn
-- A2: Từ chối mượn
-- A3: Hiển thị lý do từ chối Các quy tắc chính là:
-- Nếu C1 = False, từ chối mượn.
-- Nếu C2 = True, từ chối mượn.
-- Nếu C4 = True, từ chối mượn.
+  - A1: Cho phép mượn
+  - A2: Từ chối mượn
+  - A3: Hiển thị lý do từ chối với các quy tắc chính là:
+    - Nếu C1 = False, từ chối mượn.
+    - Nếu C2 = True, từ chối mượn.
+    - Nếu C4 = True, từ chối mượn.
 - Chỉ khi C1 = True, C2 = False, và C4 = False, hệ thống mới cho phép mượn.
 - C3 được dùng để xác định giới hạn là 5 hay 10, nhưng quyết định mượn sách cuối cùng đã được xác định bởi C4.
 
@@ -809,7 +812,7 @@ Từ các quy tắc trên, ta lập bảng Decision Table rút gọn. Bảng nà
 | --- | --- | --- | --- | --- |
 | C1. Account active? | F | T | T | T |
 | C2. Overdue books? | - | T | F | F |
-| C4. Exceeded limit? | - | - | T | F |
+| C4. Borrowing limit reached or exceeded? | - | - | T | F |
 | A1. Allow borrowing | F | F | F | T |
 | A2. Reject borrowing | T | T | T | F |
 | A3. Rejection reason | Account inactive | Overdue books exist | Borrowing limit exceeded | - |
@@ -822,7 +825,7 @@ Bảng rút gọn này có bốn quy tắc cốt lõi:
 
 Thiết kế bảng test case:
 
-| Test case | C1 | C2 | C3 | Current borrowed books | Limit | Expected result |
+| Test case | Account active | Overdue books | Member type | Current borrowed books | Limit | Expected result |
 | --- | --- | --- | --- | --- | --- | --- |
 | TC-001 | False | False | Non-VIP | 0 | 5 | Reject, show “account inactive” |
 | TC-002 | True | True | Non-VIP | 2 | 5 | Reject, show “overdue books exist” |
@@ -833,12 +836,12 @@ Bốn test case trên là đủ để bao phủ bốn quy tắc rút gọn.
 
 Bởi vì C3 ảnh hưởng đến cách đánh giá C4, bộ test case thực tế cũng nên xác minh hai giới hạn mượn sách khác nhau:
 
-| Test case | Member type | Current borrowed books | Expected result |
-| --- | --- | --- | --- |
-| TC-005 | Non-VIP | 4 | Allow borrowing |
-| TC-006 | Non-VIP | 5 | Reject because the limit has been reached |
-| TC-007 | VIP | 9 | Allow borrowing |
-| TC-008 | VIP | 10 | Reject because the limit has been reached |
+| Test case | Account active | Overdue books | Member type | Current borrowed books | Expected result |
+| --- | --- | --- | --- | --- | --- |
+| TC-005 | True | False | Non-VIP | 4 | Allow borrowing |
+| TC-006 | True | False | Non-VIP | 5 | Reject because the limit has been reached |
+| TC-007 | True | False | VIP | 9 | Allow borrowing |
+| TC-008 | True | False | VIP | 10 | Reject because the limit has been reached |
 
 Như vậy, Reduced Decision Table chỉ cần 4 test case cốt lõi, nhưng một bộ test case thực tế đầy đủ hơn nên chứa 8 test case để xác minh chính xác cả hai chính sách giới hạn.
 
@@ -860,7 +863,7 @@ Cho bảng sau về một quy trình check-in khách tại khách sạn. Hãy v�
 
 Activity diagram của quy trình check-in khách tại khách sạn:
 
-![](/diagrams/V0S2AU6.png)
+![](diagrams/V0S2AU6.png)
 
 - Với Alternative flow Change room, xảy ra ngay trước bước 5 để khách hàng có thể chọn lại phòng khác, sau đó nối vào flow bước 4 để hệ thống hiển thị lại thông tin chi tiết về phòng đó.
 - Với Alternative flow Upgrade room, tùy theo ngữ cảnh thực tế mà nối flow vào. Ví dụ, sau bước 3B2, nếu nối flow vào sau bước 2: việc upgrade có thể diễn ra nhiều lần. Nếu nối flow vào trước bước 3, việc upgrade chỉ diễn ra một lần như trong sơ đồ đang vẽ.
@@ -879,61 +882,58 @@ Tiến hành thiết kế các test scenario:
 | TS-005 | Change room trước khi nhập thông tin check-in | 1, 2, 3, 4, 5A1, 4, 5, 6 |
 | TS-006 | Dữ liệu check-in không hợp lệ | 1, 2, 3, 4, 5, ERR |
 
-Bảng Use Case Test Cases tương ứng trực tiếp với 6 Scenario. Các test case mới ở trạng thái `Not Run`; chỉ đổi thành `PASS` hoặc `FAIL` sau khi đã thực thi trên hệ thống:
+Use Case Testing: Nhóm này kiểm tra các luồng Basic Flow, Alternative Flow và Exception Flow liên quan đến tìm kiếm reservation, upgrade room và change room.
 
-| Test Case ID | Mô tả Test Case | Tiền điều kiện / dữ liệu | Bước thực hiện | Kết quả mong đợi | Trạng thái |
-| --- | --- | --- | --- | --- | --- |
-| TC-001-001 | Check-in trực tiếp thành công | Receptionist đã đăng nhập; Standard 101 còn trống; guest `An Nguyen`, DOB `10/02/1995`, Gender `Male`, ID `ID001`; check-out = ngày mai | Chọn Standard → chọn phòng 101 → kiểm tra detail/current date → nhập guest data → Confirm | Chỉ các phòng Standard còn trống được hiển thị; detail là phòng 101; check-in date là ngày hiện tại; bản ghi check-in được tạo cho đúng guest/phòng/ngày | Not Run |
-| TC-002-001 | Check-in bằng reservation thành công | Có reservation `RES001` cho `An Nguyen`, loại Deluxe; Deluxe 201 còn trống | Tìm `An Nguyen` → chọn `RES001` → chọn phòng 201 → nhập dữ liệu còn thiếu → Confirm | Hiển thị đúng reservation và các phòng Deluxe còn trống; bản ghi check-in liên kết với `RES001` và phòng 201 | Not Run |
-| TC-003-001 | Không tìm thấy reservation rồi check-in trực tiếp | Không có reservation cho `No Match`; Standard 101 còn trống | Tìm `No Match` → quay về tìm phòng → chọn Standard và phòng 101 → nhập dữ liệu hợp lệ → Confirm | Hiển thị trang không có reservation; cho phép chuyển sang luồng trực tiếp; check-in được tạo cho phòng 101 | Not Run |
-| TC-004-001 | Nâng hạng phòng trước khi chọn | Standard và Deluxe còn trống | Chọn Standard → Upgrade → kiểm tra danh sách → chọn Deluxe 201 → nhập dữ liệu hợp lệ → Confirm | Danh sách chỉ gồm các loại phòng cao hơn và được sắp theo category; check-in được tạo cho Deluxe 201 | Not Run |
-| TC-005-001 | Đổi phòng trước khi nhập guest data | Standard 101 và 102 còn trống | Chọn Standard 101 → tại trang detail chọn Change room → chọn 102 → nhập dữ liệu hợp lệ → Confirm | Detail được cập nhật thành phòng 102; bản ghi cuối cùng gắn với 102, không gắn với 101 | Not Run |
-| TC-006-001 | Sửa dữ liệu không hợp lệ rồi gửi lại | Standard 101 còn trống; First Name ban đầu để trống | Chọn phòng 101 → nhập dữ liệu, để trống First Name → Confirm → nhập `An` → Confirm lại | Lần đầu hiển thị `First Name misconfigured, please check` và không tạo bản ghi; form vẫn cho sửa; lần hai tạo đúng một bản ghi check-in | Not Run |
+| Test Case ID | Test Scenario | Test Case Description                                            | Preconditions                                                                                                                  | Test Data                                                                                                            | Test Steps                                                                                                                                                                                                                                | Expected Result                                                                                                                                                                                                                                                                       |
+| ------------ | ------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-001       | TS-001        | Check-in trực tiếp thành công (Basic Flow)                       | Receptionist đã đăng nhập và đang ở Check-in Page. Phòng Standard 101 còn trống.                                               | Room Type: Standard; Room: 101; Guest: An Nguyen; DOB: 10/02/1995; Gender: Male; ID: ID001; Check-out: 05/06/2026    | 1. Chọn Room Type = Standard. 2. Chọn phòng 101 trong danh sách. 3. Kiểm tra thông tin phòng. 4. Nhập đầy đủ Guest Information và Check-out Date. 5. Nhấn Confirm Check-in.                                                               | 1. Hệ thống hiển thị danh sách phòng Standard còn trống. 2. Hiển thị đúng thông tin phòng 101. 3. Check-in Date mặc định là 04/06/2026. 4. Thông tin hợp lệ được chấp nhận. 5. Hệ thống ghi nhận check-in thành công cho khách An Nguyen tại phòng 101.                               |
+| TC-002       | TS-002        | Check-in thành công bằng reservation có sẵn                      | Receptionist đã đăng nhập. Reservation RES001 tồn tại. Phòng Deluxe 201 còn trống.                                             | Guest Search: An Nguyen; Reservation: RES001; Room Type: Deluxe; Room: 201; Check-out: 05/06/2026                    | 1. Chọn tìm kiếm reservation. 2. Nhập tên An Nguyen. 3. Chọn reservation RES001. 4. Chọn phòng Deluxe 201. 5. Nhập đầy đủ thông tin khách và ngày check-out. 6. Nhấn Confirm Check-in.                                                    | 1. Hiển thị các reservation khớp với tên khách. 2. Reservation RES001 được tìm thấy. 3. Hiển thị danh sách phòng Deluxe còn trống. 4. Hiển thị đúng thông tin phòng 201. 5. Check-in được ghi nhận thành công cho khách An Nguyen tại phòng 201.                                      |
+| TC-003       | TS-003        | Không tìm thấy reservation, sau đó check-in trực tiếp thành công | Receptionist đã đăng nhập. Không tồn tại reservation cho tên No Match. Phòng Standard 101 còn trống.                           | Guest Search: No Match; Room Type: Standard; Room: 101; Guest: An Nguyen; Check-out: 05/06/2026                      | 1. Chọn tìm kiếm reservation. 2. Nhập No Match. 3. Thực hiện tìm kiếm. 4. Quay về bước chọn Room Type. 5. Chọn Standard và phòng 101. 6. Nhập đầy đủ thông tin khách. 7. Nhấn Confirm Check-in.                                           | 1. Hệ thống hiển thị trang không tìm thấy reservation. 2. Cho phép quay lại bước chọn Room Type. 3. Hiển thị danh sách phòng Standard còn trống. 4. Hệ thống ghi nhận check-in thành công tại phòng 101.                                                                              |
+| TC-004       | TS-004        | Upgrade room trước khi chọn phòng                                | Receptionist đã đăng nhập. Có phòng Standard và Deluxe còn trống. Deluxe là loại phòng cao hơn Standard theo dữ liệu kiểm thử. | Original Room Type: Standard; Upgrade Room Type: Deluxe; Selected Room: 201; Guest: An Nguyen; Check-out: 05/06/2026 | 1. Chọn Room Type = Standard. 2. Tại danh sách phòng, chọn Upgrade Room. 3. Kiểm tra danh sách các loại phòng cao hơn. 4. Chọn phòng Deluxe 201. 5. Nhập đầy đủ thông tin khách và ngày check-out. 6. Nhấn Confirm Check-in.              | 1. Hệ thống hiển thị danh sách phòng thuộc các loại cao hơn Standard và còn trống. 2. Danh sách được sắp xếp theo Room Type Category. 3. Phòng Deluxe 201 có thể được chọn. 4. Hệ thống hiển thị đúng thông tin phòng 201. 5. Check-in được ghi nhận thành công tại phòng Deluxe 201. |
+| TC-005       | TS-005        | Change room trước khi nhập thông tin khách                       | Receptionist đã đăng nhập. Phòng Standard 101 và 102 còn trống.                                                                | Original Room: 101; New Room: 102; Room Type: Standard; Guest: An Nguyen; Check-out: 05/06/2026                      | 1. Chọn Room Type = Standard. 2. Chọn phòng 101. 3. Tại trang thông tin phòng, chọn Change Room. 4. Chọn phòng Standard 102. 5. Kiểm tra thông tin phòng mới. 6. Nhập đầy đủ thông tin khách và ngày check-out. 7. Nhấn Confirm Check-in. | 1. Hệ thống hiển thị danh sách các phòng khác còn trống. 2. Cho phép chọn phòng 102. 3. Hiển thị thông tin chi tiết của phòng 102 thay cho phòng 101. 4. Check-in Date là 04/06/2026. 5. Check-in được ghi nhận thành công cho phòng 102, không phải phòng 101.                       |
 
-Bảng ECP Test Cases áp dụng cho các trường bắt buộc:
+Equivalence Partitioning: Nhóm này bao phủ TS-006, theo Use Case Specification, năm trường thông tin bắt buộc là First Name, Last Name, Date of Birth, Gender và ID Number. Với mỗi test case, chỉ một trường được để trống, tất cả trường còn lại đều hợp lệ. Cách thiết kế này giúp xác định rõ lỗi validation tương ứng.
 
-| Test Case ID | Mô tả Test Case | Tiền điều kiện | Bước thực hiện | Kết quả mong đợi | Trạng thái |
-| --- | --- | --- | --- | --- | --- |
-| TC-ECP-001 | Thiếu First Name | Đang ở Step 5; các trường khác hợp lệ | Để trống First Name và Confirm | Hiển thị `First Name misconfigured, please check`; không tạo check-in | Not Run |
-| TC-ECP-002 | Thiếu Last Name | Đang ở Step 5; các trường khác hợp lệ | Để trống Last Name và Confirm | Hiển thị `Last Name misconfigured, please check`; không tạo check-in | Not Run |
-| TC-ECP-003 | Thiếu Date of Birth | Đang ở Step 5; các trường khác hợp lệ | Để trống Date of Birth và Confirm | Hiển thị `Date of Birth misconfigured, please check`; không tạo check-in | Not Run |
-| TC-ECP-004 | Thiếu Gender | Đang ở Step 5; các trường khác hợp lệ | Không chọn Gender và Confirm | Hiển thị `Gender misconfigured, please check`; không tạo check-in | Not Run |
-| TC-ECP-005 | Thiếu ID Number | Đang ở Step 5; các trường khác hợp lệ | Để trống ID Number và Confirm | Hiển thị `ID Number misconfigured, please check`; không tạo check-in | Not Run |
-| TC-ECP-006 | Tất cả dữ liệu hợp lệ | Đang ở Step 5 | Nhập đầy đủ dữ liệu và Confirm | Hệ thống chấp nhận dữ liệu và tạo check-in | Not Run |
+| Test Case ID | Test Scenario | Test Case Description                       | Preconditions                                                                                | Test Data                                                                                             | Test Steps                                                                                                                           | Expected Result                                                                               |
+| ------------ | ------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| TC-006       | TS-006        | Kiểm tra validation khi thiếu First Name    | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Đang ở bước nhập Guest Information. | First Name: Blank; Last Name: Nguyen; DOB: 10/02/1995; Gender: Male; ID: ID001; Check-out: 05/06/2026 | 1. Để trống First Name. 2. Nhập đầy đủ các trường còn lại. 3. Nhấn Confirm Check-in.                                                 | 1. Hiển thị `First Name misconfigured, please check`. 2. Hệ thống không ghi nhận check-in.    |
+| TC-007       | TS-006        | Kiểm tra validation khi thiếu Last Name     | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Đang ở bước nhập Guest Information. | First Name: An; Last Name: Blank; DOB: 10/02/1995; Gender: Male; ID: ID001; Check-out: 05/06/2026     | 1. Nhập First Name = An. 2. Để trống Last Name. 3. Nhập đầy đủ các trường còn lại. 4. Nhấn Confirm Check-in.                         | 1. Hiển thị `Last Name misconfigured, please check`. 2. Hệ thống không ghi nhận check-in.     |
+| TC-008       | TS-006        | Kiểm tra validation khi thiếu Date of Birth | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Đang ở bước nhập Guest Information. | First Name: An; Last Name: Nguyen; DOB: Blank; Gender: Male; ID: ID001; Check-out: 05/06/2026         | 1. Nhập First Name và Last Name hợp lệ. 2. Để trống Date of Birth. 3. Nhập đầy đủ các trường còn lại. 4. Nhấn Confirm Check-in.      | 1. Hiển thị `Date of Birth misconfigured, please check`. 2. Hệ thống không ghi nhận check-in. |
+| TC-009       | TS-006        | Kiểm tra validation khi thiếu Gender        | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Đang ở bước nhập Guest Information. | First Name: An; Last Name: Nguyen; DOB: 10/02/1995; Gender: Blank; ID: ID001; Check-out: 05/06/2026   | 1. Nhập First Name, Last Name và DOB hợp lệ. 2. Không chọn Gender. 3. Nhập các trường còn lại. 4. Nhấn Confirm Check-in.             | 1. Hiển thị `Gender misconfigured, please check`. 2. Hệ thống không ghi nhận check-in.        |
+| TC-010       | TS-006        | Kiểm tra validation khi thiếu ID Number     | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Đang ở bước nhập Guest Information. | First Name: An; Last Name: Nguyen; DOB: 10/02/1995; Gender: Male; ID: Blank; Check-out: 05/06/2026    | 1. Nhập đầy đủ First Name, Last Name, DOB và Gender. 2. Để trống ID Number. 3. Nhập Check-out Date hợp lệ. 4. Nhấn Confirm Check-in. | 1. Hiển thị `ID Number misconfigured, please check`. 2. Hệ thống không ghi nhận check-in.     |
 
-Bảng BVA Test Cases áp dụng cho Expected Check-out Date:
+Các trường hợp có dữ liệu hợp lệ đã được kiểm thử trong TC-001 đến TC-005. Vì vậy, không cần tạo thêm một test case ECP chỉ để kiểm tra tất cả trường hợp lệ.
 
-Theo đúng yêu cầu hiện có, chỉ ngày check-out **trước** ngày check-in là không hợp lệ; vì vậy ngày bằng ngày check-in được xem là hợp lệ. Nếu khách sạn yêu cầu ít nhất một đêm lưu trú thì đây là requirement gap cần được BA xác nhận và cập nhật.
+Boundary Value Analysis: Theo Use Case Specification, Expected Check-out Date không được trước Check-in Date.
 
-| Test Case ID | Mô tả Test Case | Tiền điều kiện | Bước thực hiện | Kết quả mong đợi | Trạng thái |
-| --- | --- | --- | --- | --- | --- |
-| TC-BVA-001 | Check-out nhỏ hơn check-in một ngày | Check-in = 04/06/2026; các trường khác hợp lệ | Nhập check-out = 03/06/2026 và Confirm | Hiển thị `Expected Check-out Date misconfigured, please check`; không tạo check-in | Not Run |
-| TC-BVA-002 | Check-out bằng check-in | Check-in = 04/06/2026; các trường khác hợp lệ | Nhập check-out = 04/06/2026 và Confirm | Dữ liệu được chấp nhận và check-in được tạo theo yêu cầu hiện có | Not Run |
-| TC-BVA-003 | Check-out lớn hơn check-in một ngày | Check-in = 04/06/2026; các trường khác hợp lệ | Nhập check-out = 05/06/2026 và Confirm | Dữ liệu được chấp nhận và check-in được tạo | Not Run |
+| Test Case ID | Test Scenario | Test Case Description                                | Preconditions                                                                                      | Test Data                                                                                               | Test Steps                                                                                                                                                                | Expected Result                                                                                                                                          |
+| ------------ | ------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-011       | TS-006        | Kiểm tra Check-out Date trước Check-in Date một ngày | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Check-in Date của hệ thống là 04/06/2026. | Check-in: 04/06/2026; Check-out: 03/06/2026; Guest: An Nguyen; DOB: 10/02/1995; Gender: Male; ID: ID001 | 1. Chọn phòng Standard 101. 2. Kiểm tra Check-in Date = 04/06/2026. 3. Nhập đầy đủ thông tin khách hợp lệ. 4. Nhập Check-out Date = 03/06/2026. 5. Nhấn Confirm Check-in. | 1. Hệ thống phát hiện Check-out Date trước Check-in Date. 2. Hiển thị `Expected Check-out Date misconfigured, please check`. 3. Không ghi nhận check-in. |
+| TC-012       | TS-001        | Kiểm tra Check-out Date bằng Check-in Date           | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Check-in Date của hệ thống là 04/06/2026. | Check-in: 04/06/2026; Check-out: 04/06/2026; Guest: An Nguyen; DOB: 10/02/1995; Gender: Male; ID: ID001 | 1. Chọn phòng Standard 101. 2. Kiểm tra Check-in Date = 04/06/2026. 3. Nhập đầy đủ thông tin khách hợp lệ. 4. Nhập Check-out Date = 04/06/2026. 5. Nhấn Confirm Check-in. | 1. Check-out Date được chấp nhận theo đặc tả hiện tại. 2. Không hiển thị lỗi ngày check-out. 3. Hệ thống ghi nhận check-in thành công.                   |
+| TC-013       | TS-001        | Kiểm tra Check-out Date sau Check-in Date một ngày   | Receptionist đã đăng nhập. Phòng Standard 101 còn trống. Check-in Date của hệ thống là 04/06/2026. | Check-in: 04/06/2026; Check-out: 05/06/2026; Guest: An Nguyen; DOB: 10/02/1995; Gender: Male; ID: ID001 | 1. Chọn phòng Standard 101. 2. Kiểm tra Check-in Date = 04/06/2026. 3. Nhập đầy đủ thông tin khách hợp lệ. 4. Nhập Check-out Date = 05/06/2026. 5. Nhấn Confirm Check-in. | 1. Check-out Date được chấp nhận. 2. Không hiển thị lỗi validation. 3. Hệ thống ghi nhận check-in thành công cho phòng 101.                              |
 
-Bảng Decision Table rút gọn dưới đây áp dụng Single Fault Assumption: mỗi rule lỗi chỉ có một điều kiện không hợp lệ, các điều kiện còn lại hợp lệ.
+Lưu ý: TC-012 chấp nhận ngày check-out bằng ngày check-in vì đặc tả chỉ cấm ngày check-out trước ngày check-in. Đây là kết quả theo yêu cầu đã cho, không khẳng định rằng mọi khách sạn đều cho phép lưu trú không qua đêm.
 
-| Condition / Action | R1 | R2 | R3 | R4 | R5 | R6 | R7 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| First Name valid? | N | Y | Y | Y | Y | Y | Y |
-| Last Name valid? | Y | N | Y | Y | Y | Y | Y |
-| DOB valid? | Y | Y | N | Y | Y | Y | Y |
-| Gender valid? | Y | Y | Y | N | Y | Y | Y |
-| ID Number valid? | Y | Y | Y | Y | N | Y | Y |
-| Check-out date valid? | Y | Y | Y | Y | Y | N | Y |
-| Show field error | First Name | Last Name | DOB | Gender | ID Number | Check-out Date | - |
-| Record check-in | N | N | N | N | N | N | Y |
+Bảng Test Coverage Matrix:
 
-Các test case được rút ra trực tiếp từ bảy rule:
+| Requirement/Flow                      | Test Case ID | Technique        |
+| ------------------------------------- | ------------ | ---------------- |
+| Basic Flow — Direct Check-in          | TC-001       | Use Case Testing |
+| Alternative — Check-in by Reservation | TC-002       | Use Case Testing |
+| Exception — No Reservation            | TC-003       | Use Case Testing |
+| Alternative — Upgrade Room            | TC-004       | Use Case Testing |
+| Alternative — Change Room             | TC-005       | Use Case Testing |
+| Required Field — First Name           | TC-006       | ECP              |
+| Required Field — Last Name            | TC-007       | ECP              |
+| Required Field — Date of Birth        | TC-008       | ECP              |
+| Required Field — Gender               | TC-009       | ECP              |
+| Required Field — ID Number            | TC-010       | ECP              |
+| Check-out Date below boundary         | TC-011       | BVA              |
+| Check-out Date at boundary            | TC-012       | BVA              |
+| Check-out Date above boundary         | TC-013       | BVA              |
 
-| Test Case ID | Rule | Dữ liệu khác biệt | Kết quả mong đợi | Trạng thái |
-| --- | --- | --- | --- | --- |
-| TC-DT-001 | R1 | First Name = Blank | Báo lỗi First Name; không ghi nhận check-in | Not Run |
-| TC-DT-002 | R2 | Last Name = Blank | Báo lỗi Last Name; không ghi nhận check-in | Not Run |
-| TC-DT-003 | R3 | DOB = Blank | Báo lỗi DOB; không ghi nhận check-in | Not Run |
-| TC-DT-004 | R4 | Gender = Blank | Báo lỗi Gender; không ghi nhận check-in | Not Run |
-| TC-DT-005 | R5 | ID Number = Blank | Báo lỗi ID Number; không ghi nhận check-in | Not Run |
-| TC-DT-006 | R6 | Check-out date < check-in date | Báo lỗi Check-out Date; không ghi nhận check-in | Not Run |
-| TC-DT-007 | R7 | Tất cả điều kiện hợp lệ | Ghi nhận check-in thành công | Not Run |
+Bộ 13 Test Case này phù hợp để đưa vào tài liệu. Nó bao phủ cả 6 Test Scenario, kiểm tra từng trường bắt buộc và các giá trị biên của ngày check-out mà không cần tạo các test case Decision Table trùng lặp.
 
-Đề bài chưa quy định hệ thống hiển thị lỗi đầu tiên hay tất cả lỗi khi nhiều trường cùng sai. Nếu cần kiểm tra multiple faults, phải bổ sung các rule kết hợp và xác định rõ expected message/order với BA.
+Một điểm cần nhớ: đây là bộ kiểm thử gọn theo phạm vi Use Case đã đặc tả, không phải bộ test toàn diện cho hệ thống khách sạn thực tế. Các trường hợp như nhiều trường cùng sai, thay đổi phòng nhiều lần hoặc sửa dữ liệu sau khi validation thất bại có thể được bổ sung khi yêu cầu nghiệp vụ được làm rõ.
+
+Đối với Decision Table Testing, chúng ta không nhất thiết phải sử dụng vì logic kiểm tra dữ liệu tương đối đơn giản, các điều kiện validation độc lập và những trường hợp quan trọng đã được bao phủ bằng Equivalence Partitioning (ECP) và Boundary Value Analysis (BVA). Tuy nhiên, điều đó không có nghĩa Decision Table không áp dụng được. Vấn đề là áp dụng Decision Table không giúp phát hiện thêm lỗi mà các test case hiện tại chưa kiểm tra.
