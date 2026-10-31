@@ -1,7 +1,5 @@
 # SOFTWARE TESTING
 
----
-
 # Test Design Techniques
 
 ## Black Box Testing
@@ -30,7 +28,7 @@ Sử dụng Boundary Value Analysis (BVA), hãy thiết kế các tập test cas
 
 Giả định cả hai trường `Duration` và `Number of Students` đều là số nguyên. Hệ thống không chấp nhận giá trị thập phân, ký tự hoặc dữ liệu không đúng định dạng. Các test case trong bài tập tập trung vào kiểm thử ranh giới của miền giá trị số nguyên.
 
-**Lời giải chi tiết**
+**LỜI GIẢI CHI TIẾT**
 
 Để thiết kế BVA test set, trước tiên ta cần xác định các phạm vi hợp lệ, giá trị danh nghĩa, và sau đó sinh ra các giá trị biên cho từng biến đầu vào. Có 2 biến đầu vào:
 
@@ -247,7 +245,7 @@ Sử dụng Boundary Value Analysis (BVA), hãy thiết kế các tập test cas
 - Trình bày các test case dưới dạng bảng.
 - Đối với Worst-case BVA và Robust Worst-case BVA, chỉ trình bày một vài test case đại diện.
 
-**Lời giải chi tiết**
+**LỜI GIẢI CHI TIẾT**
 
 Để thiết kế các tập test case BVA, trước ta cần xác định các phạm vi hợp lệ, các giá trị nominal, và các giá trị biên cho từng biến đầu vào. Có 4 biến đầu vào:
 
@@ -414,7 +412,7 @@ Một hệ thống đặt vé xem phim cho phép khách hàng đặt vé bằng 
 
 | Data field | Description | Valid range |
 | --- | --- | --- |
-| `Age` | Tuổi của khách hàng | 6-80 |
+| `Age` | Tuổi của khách hàng | 6 -> 80 |
 | `Seat type` | Loại ghế được chọn bởi khách hàng | S, P |
 
 Hệ thống phải kiểm tra tính hợp lệ của dữ liệu đầu vào theo các quy tắc sau:
@@ -439,7 +437,7 @@ Sử dụng Equivalence Class Partitioning (ECP), hãy thiết kế các tập t
 - Trình bày các test case dưới dạng bảng.
 - Đối với Strong Robust ECP, chỉ trình bày một vài test case đại diện.
 
-**Lời giải chi tiết**
+**LỜI GIẢI CHI TIẾT**
 
 Để thiết kế các tập test case ECP, trước tiên ta cần xác định các equivalence classes cho từng biến đầu vào. Hệ thống chỉ chấp nhận đặt vé khi cả hai đầu vào đều thuộc về các equivalence classes hợp lệ:
 
@@ -565,7 +563,7 @@ Sử dụng kỹ thuật Equivalence Partitioning (ECP), hãy thiết kế các 
 - Xác định các tương đương (equivalence classes) cho từng đầu vào.
 - Trình bày các test case dưới dạng bảng (đối với Strong Robust ECP, chỉ trình bày một vài test case đại diện).
 
-**Lời giải chi tiết**
+**LỜI GIẢI CHI TIẾT**
 
 Để thiết kế các tập test case ECP, trước tiên ta cần xác định các equivalence classes cho từng biến đầu vào. Hệ thống chỉ chấp nhận yêu cầu đặt tủ khi cả hai đầu vào đều thuộc về các equivalence classes hợp lệ:
 
@@ -593,7 +591,7 @@ Số lượng test case: Do biến `Locker size` có số lớp hợp lệ lớn
 
 Đối với Weak Robust ECP, ta cần đảm bảo mọi lớp (cả hợp lệ lẫn không hợp lệ) xuất hiện ít nhất một lần. Áp dụng giả định lỗi đơn (Single Fault Assumption), mỗi test case không hợp lệ chỉ chứa đúng 1 giá trị không hợp lệ.
 
-Số lượng test case: 3 (Normal) + 2 (Invalid `Duration`) + 2 (Invalid Size) = 7 test cases
+Số lượng test case: 3 (Normal) + 2 (Invalid `Duration`) + 2 (`Invalid Size`) = 7 test cases
 
 | Test case | `Duration` | `Locker size` | Covered classes | Expected Result |
 | --- | --- | --- | --- | --- |
@@ -678,7 +676,7 @@ Quy tắc xử lý và phê duyệt của hệ thống như sau:
 - Hồ sơ bị từ chối theo quy tắc nghiệp vụ nếu `Employment Type` là F, hoặc nếu Credit Score thuộc nhóm Weak và Monthly Income thuộc Tier 1, mặc dù cả hai giá trị đầu vào đều hợp lệ.
 - Hệ thống hiển thị Thông báo lỗi (Error) nếu có bất kỳ trường nào có dữ liệu không hợp lệ (out of range/invalid character/blank).
 
-**Lời giải chi tiết**
+**LỜI GIẢI CHI TIẾT**
 
 Để thiết kế các tập test case ECP, trước tiên ta cần xác định các equivalence classes cho từng biến đầu vào bằng cách xây dựng bảng Phân tích các Lớp Tương Đương (Equivalence Classes):
 
@@ -699,7 +697,7 @@ Quy tắc xử lý và phê duyệt của hệ thống như sau:
 | `Employment Type` | EC13 | Blank | Invalid: Missing |
 | `Employment Type` | EC14 | Any value other than P, C, F or Blank | Invalid: Other character |
 
-Đối với Weak Normal ECP, ta chọn một đại diện từ mỗi lớp hợp lệ và đảm bảo mọi lớp hợp lệ đều xuất hiện ít nhất một lần: EC1–EC3, EC6–EC7, EC10–EC12. Số lượng test case: Biến `Credit Score` và `Employment Type` có số lớp hợp lệ lớn nhất (3 lớp), nên số lượng test case tối thiểu là 3.
+Đối với Weak Normal ECP, ta chọn một đại diện từ mỗi lớp hợp lệ và đảm bảo mọi lớp hợp lệ đều xuất hiện ít nhất một lần: EC1 –> EC3, EC6 –> EC7, EC10 –> EC12. Biến `Credit Score` và `Employment Type` có số lớp hợp lệ lớn nhất (3 lớp), nên số lượng test case tối thiểu là 3.
 
 | Test case | `Credit Score` | `Monthly Income` | `Employment Type` | Covered classes | Expected result |
 | --- | --- | --- | --- | --- | --- |
@@ -707,7 +705,11 @@ Quy tắc xử lý và phê duyệt của hệ thống như sau:
 | TC-002 | 680 | 50 | C | EC2, EC7, EC11 | Approved |
 | TC-003 | 800 | 50 | F | EC3, EC7, EC12 | Rejected: Freelance |
 
-Đối với Weak Robust ECP, ta cần bao phủ tất cả các lớp (cả hợp lệ lẫn không hợp lệ) ít nhất một lần, tuân thủ nguyên tắc Single Fault Assumption (mỗi test case không hợp lệ chỉ vi phạm đúng 1 biến). Số lượng test case: 3 (Base Normal) + 2 (Invalid Credit) + 2 (Invalid Income) + 2 (Invalid Employment) = 9 test cases
+Đối với Weak Robust ECP, ta cần bao phủ tất cả các lớp (cả hợp lệ lẫn không hợp lệ) ít nhất một lần, tuân thủ nguyên tắc Single Fault Assumption (mỗi test case không hợp lệ chỉ vi phạm đúng 1 biến). Số lượng test case là:
+
+$$
+3_{\text{Base Normal}} + 2_{\text{Invalid Credit}} + 2_{\text{Invalid Income}} + 2_{\text{Invalid Employment}} = 9\ \text{test cases}
+$$
 
 | Test case | `Credit Score` | `Monthly Income` | `Employment Type` | Covered classes | Expected result |
 | --- | --- | --- | --- | --- | --- |
@@ -721,7 +723,7 @@ Quy tắc xử lý và phê duyệt của hệ thống như sau:
 | TC-008 | 680 | 50 | Blank | EC2, EC7, EC13 | Error: Missing employment type |
 | TC-009 | 680 | 50 | K | EC2, EC7, EC14 | Error: Invalid employment type |
 
-Đối với Strong Normal ECP, ta kết hợp tất cả các lớp hợp lệ của 3 biến được tổ hợp đầy đủ với nhau. Số lượng test case:
+Đối với Strong Normal ECP, ta kết hợp tất cả các lớp hợp lệ của 3 biến được tổ hợp đầy đủ với nhau. Số lượng test case là:
 
 $$
 3_{\text{`Credit Score`}} \times 2_{\text{Income}} \times 3_{\text{Employment}} = 18\ \text{test cases}
@@ -790,19 +792,23 @@ Sử dụng Decision Table Testing, hãy xây dựng một Decision Table cho c�
 - Rút ra các test case từ decision table.
 - Giải thích xem bài toán có chứa quy tắc vô lý/bất khả thi (impossible rule) nào không.
 
-**Lời giải chi tiết**
+**LỜI GIẢI CHI TIẾT**
 
 Trước tiên, ta cần xác định các business conditions:
 - C1: Tài khoản có đang hoạt động không?
 - C2: Người dùng có sách quá hạn không?
 - C3: Người dùng có phải là thành viên VIP không?
-- C4: Người dùng đã đạt đến hoặc vượt quá giới hạn mượn sách chưa? Các actions là:
-  - A1: Cho phép mượn
-  - A2: Từ chối mượn
-  - A3: Hiển thị lý do từ chối với các quy tắc chính là:
-    - Nếu C1 = False, từ chối mượn.
-    - Nếu C2 = True, từ chối mượn.
-    - Nếu C4 = True, từ chối mượn.
+- C4: Người dùng đã đạt đến hoặc vượt quá giới hạn mượn sách chưa?
+
+Với các actions là:
+- A1: Cho phép mượn
+- A2: Từ chối mượn
+- A3: Hiển thị lý do từ chối
+
+Các quy tắc chính là:
+- Nếu C1 = False, từ chối mượn.
+- Nếu C2 = True, từ chối mượn.
+- Nếu C4 = True, từ chối mượn.
 - Chỉ khi C1 = True, C2 = False, và C4 = False, hệ thống mới cho phép mượn.
 - C3 được dùng để xác định giới hạn là 5 hay 10, nhưng quyết định mượn sách cuối cùng đã được xác định bởi C4.
 
@@ -836,16 +842,18 @@ Bốn test case trên là đủ để bao phủ bốn quy tắc rút gọn.
 
 Bởi vì C3 ảnh hưởng đến cách đánh giá C4, bộ test case thực tế cũng nên xác minh hai giới hạn mượn sách khác nhau:
 
-| Test case | Account active | Overdue books | Member type | Current borrowed books | Expected result |
-| --- | --- | --- | --- | --- | --- |
-| TC-005 | True | False | Non-VIP | 4 | Allow borrowing |
-| TC-006 | True | False | Non-VIP | 5 | Reject because the limit has been reached |
-| TC-007 | True | False | VIP | 9 | Allow borrowing |
-| TC-008 | True | False | VIP | 10 | Reject because the limit has been reached |
+| Test case | Account active | Overdue books | Member type | Current borrowed books | Limit | Expected result |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-005 | True | False | Non-VIP | 4 | 5 | Allow borrowing |
+| TC-006 | True | False | Non-VIP | 5 | 5 | Reject because the limit has been reached |
+| TC-007 | True | False | VIP | 9 | 10 | Allow borrowing |
+| TC-008 | True | False | VIP | 10 | 10 | Reject because the limit has been reached |
 
 Như vậy, Reduced Decision Table chỉ cần 4 test case cốt lõi, nhưng một bộ test case thực tế đầy đủ hơn nên chứa 8 test case để xác minh chính xác cả hai chính sách giới hạn.
 
-Về Impossible rule analysis, bảng rút gọn trên không chứa impossible rule vì C4 được coi là điều kiện dẫn xuất đã tính sẵn và mọi giá trị True/False của nó đều có thể xảy ra với cả VIP và Non-VIP khi số sách hiện tại thay đổi. Tuy nhiên, C4 không hoàn toàn độc lập: nó được tính từ loại thành viên, số sách đang mượn và giới hạn tương ứng. Nếu một decision table chi tiết đồng thời chứa `Member type`, `Current borrowed books`, `Limit` và `Exceeded limit?`, các tổ hợp không nhất quán như Non-VIP nhưng `Limit = 10` sẽ là impossible rule và phải được loại bỏ.
+Một Impossible rule xuất hiện khi hai hoặc nhiều điều kiện không thể cùng đúng tại một thời điểm do ràng buộc nghiệp vụ. Ví dụ: C1: Người đó là sinh viên. C2: Người đó là giảng viên. Nếu quy tắc nghiệp vụ nói rằng một người không thể vừa là sinh viên vừa là giảng viên cùng một lúc, thì kết hợp C1 = True và C2 = True sẽ là một impossible rule.
+
+Bảng rút gọn trên không chứa impossible rule vì C4 được coi là điều kiện dẫn xuất đã tính sẵn và mọi giá trị True/False của nó đều có thể xảy ra với cả VIP và Non-VIP khi số sách hiện tại thay đổi. Tuy nhiên, C4 không hoàn toàn độc lập: nó được tính từ loại thành viên, số sách đang mượn và giới hạn tương ứng. Nếu một decision table chi tiết đồng thời chứa `Member type`, `Current borrowed books`, `Limit` và `Exceeded limit?`, các tổ hợp không nhất quán như Non-VIP nhưng `Limit = 10` sẽ là impossible rule và phải được loại bỏ.
 
 ### Use Case Testing
 
@@ -861,7 +869,7 @@ Cho bảng sau về một quy trình check-in khách tại khách sạn. Hãy v�
 | Alternative flow | **Change room:** Before entering guest information in Step 5, receptionist may choose to change the room:<br>- 5A.1. Receptionist chooses another room from the list of other available rooms.<br>Continue at step 4 of the basic flow.<br><br>**Upgrade room:** Before selecting a room in Step 3, receptionist may choose to view available rooms of higher room types:<br>- 3B.1. Receptionist chooses the upgrade button.<br>- 3B.2. System shows the list of available rooms of higher room types, ordered by room type categories.<br>Continue at step 3 of the basic flow.<br><br>**Check-in by reservation:** At Step 1 of the basic flow, when there is possibly a reservation:<br>- 1A.1. Receptionist enters the guest name to search for the reservation.<br>- 1A.2. System shows the page of matched reservations.<br>- 1A.3. Receptionist chooses the correct reservation.<br>- 1A.4. System shows the list of other available rooms of the room type of the booking.<br>Continue at step 3 of the basic flow. |
 | Exception | **No reservation:** After searching reservation using guest name in Step 1A.1, if no reservation is found:<br>- 1A.2.B.1. System shows the page of no reservations.<br>Continue at step 1 of the basic flow.<br><br>**Mis-configure required information:** At Step 6 of the basic flow, when there are violations of required guest information or when the expected check-out date is before the check-in date, the system shows the message: "[data item] misconfigured, please check" and does not continue.<br>The required guest information includes: first name, last name, date of birth, gender, and ID number. |
 
-Activity diagram của quy trình check-in khách tại khách sạn:
+Activity diagram của quy trình check-in khách tại khách sạn được trình bày trong hình sau:
 
 ![](diagrams/V0S2AU6.png)
 
@@ -871,16 +879,38 @@ Activity diagram của quy trình check-in khách tại khách sạn:
 - Với Exception No reservation, xảy ra ngày sau 1A1, sau đó 1A2B1 cần được nối flow vào Alternative node trước bước 1 để có thể thực hiện từ bước 1, hoặc có thể đi vào flow 1A1 để kiểm tra reservation.
 - Với Exception Mis-configure required information, cần thực hiện trước bước 6. Exception này không được thực thi theo như mô tả "does not continue", do đó nó cần đi đến điểm kết thúc.
 
-Tiến hành thiết kế các test scenario:
+Dựa trên Activity Diagram và Use Case Specification, ta thiết kế 6 Test Scenario cơ bản nhằm bao phủ Basic Flow, các Alternative Flow và các Exception Flow. Mỗi luồng được kiểm thử ít nhất một lần. Bộ scenario này hướng đến bao phủ các nhánh nghiệp vụ chính (Branch Coverage), không nhằm liệt kê toàn bộ đường đi khả thi (All-Paths Coverage), vì các Alternative Flow và Exception Flow có thể kết hợp với nhau hoặc được thực hiện lặp lại. Các test scenarios được trình bày trong bảng sau:
 
 | Test scenario ID | Mô tả | Flow |
 | --- | --- | --- |
-| TS-001 | Happy Path: Check-in trực tiếp thành công | 1, 2, 3, 4, 5, 6 |
-| TS-002 | Check-in by reservation thành công | 1A1, 1A2, 1A3, 1A4, 3, 4, 5, 6 |
-| TS-003 | Không tìm thấy reservation, sau đó check-in trực tiếp | 1A1, 1A2B1, 1, 2, 3, 4, 5, 6 |
-| TS-004 | Upgrade room trước khi chọn phòng | 1, 2, 3B1, 3B2, 3, 4, 5, 6 |
-| TS-005 | Change room trước khi nhập thông tin check-in | 1, 2, 3, 4, 5A1, 4, 5, 6 |
-| TS-006 | Dữ liệu check-in không hợp lệ | 1, 2, 3, 4, 5, ERR |
+| TS-001 | Happy Path: Check-in trực tiếp thành công | 1 → 2 → 3 → 4 → 5 → 6 |
+| TS-002 | Check-in by reservation thành công | 1A1 → 1A2 → 1A3 → 1A4 → 3 → 4 → 5 → 6 |
+| TS-003 | Không tìm thấy reservation, sau đó check-in trực tiếp | 1A1 → 1A2B1 → 1 → 2 → 3 → 4 → 5 → 6 |
+| TS-004 | Upgrade room trước khi chọn phòng | 1 → 2 → 3B1 → 3B2 → 3 → 4 → 5 → 6 |
+| TS-005 | Change room trước khi nhập thông tin check-in | 1 → 2 → 3 → 4 → 5A1 → 4 → 5 → 6 |
+| TS-006 | Dữ liệu check-in không hợp lệ | 1 → 2 → 3 → 4 → 5 → ERR |
+
+Để thiết kế Test Case, ta sử dụng bộ dữ liệu mẫu sau:
+
+| Data Field             | Test Data        |
+| ---------------------- | ---------------- |
+| Receptionist Account   | `receptionist01` |
+| Room Type              | Standard         |
+| Available Room         | 101, 102         |
+| Upgrade Room Type      | Deluxe           |
+| Upgrade Available Room | 201              |
+| Guest First Name       | An               |
+| Guest Last Name        | Nguyen           |
+| Date of Birth          | 10/02/1995       |
+| Gender                 | Male             |
+| ID Number              | ID001            |
+| Reservation ID         | RES001           |
+| Reservation Guest Name | An Nguyen        |
+| Reservation Room Type  | Deluxe           |
+| Check-in Date          | 04/06/2026       |
+| Valid Check-out Date   | 05/06/2026       |
+
+Giả định kiểm thử: Ngày hiện tại của hệ thống được cố định là 04/06/2026 trong môi trường test. Các phòng 101, 102 và 201 đều còn trống. Reservation `RES001` tồn tại và thuộc về khách An Nguyen. Các test case được thực thi độc lập, với trạng thái phòng và reservation được khôi phục trước mỗi lần chạy để tránh trường hợp test case trước làm ảnh hưởng đến test case sau.
 
 Use Case Testing: Nhóm này kiểm tra các luồng Basic Flow, Alternative Flow và Exception Flow liên quan đến tìm kiếm reservation, upgrade room và change room.
 
@@ -914,6 +944,8 @@ Boundary Value Analysis: Theo Use Case Specification, Expected Check-out Date kh
 
 Lưu ý: TC-012 chấp nhận ngày check-out bằng ngày check-in vì đặc tả chỉ cấm ngày check-out trước ngày check-in. Đây là kết quả theo yêu cầu đã cho, không khẳng định rằng mọi khách sạn đều cho phép lưu trú không qua đêm.
 
+Decision Table Testing không cần thiết phải áp dụng vì logic kiểm tra dữ liệu tương đối đơn giản, các điều kiện validation độc lập và những trường hợp quan trọng đã được bao phủ bằng Equivalence Partitioning (ECP) và Boundary Value Analysis (BVA). Decision Table Testing đặc biệt hữu ích khi kết quả của hệ thống phụ thuộc vào sự kết hợp của nhiều điều kiện. Nếu chỉ kiểm thử từng điều kiện độc lập, ta có thể bỏ sót lỗi trong logic kết hợp. Đây là trường hợp Decision Table phát huy tác dụng.
+
 Bảng Test Coverage Matrix:
 
 | Requirement/Flow                      | Test Case ID | Technique        |
@@ -932,8 +964,3 @@ Bảng Test Coverage Matrix:
 | Check-out Date at boundary            | TC-012       | BVA              |
 | Check-out Date above boundary         | TC-013       | BVA              |
 
-Bộ 13 Test Case này phù hợp để đưa vào tài liệu. Nó bao phủ cả 6 Test Scenario, kiểm tra từng trường bắt buộc và các giá trị biên của ngày check-out mà không cần tạo các test case Decision Table trùng lặp.
-
-Một điểm cần nhớ: đây là bộ kiểm thử gọn theo phạm vi Use Case đã đặc tả, không phải bộ test toàn diện cho hệ thống khách sạn thực tế. Các trường hợp như nhiều trường cùng sai, thay đổi phòng nhiều lần hoặc sửa dữ liệu sau khi validation thất bại có thể được bổ sung khi yêu cầu nghiệp vụ được làm rõ.
-
-Đối với Decision Table Testing, chúng ta không nhất thiết phải sử dụng vì logic kiểm tra dữ liệu tương đối đơn giản, các điều kiện validation độc lập và những trường hợp quan trọng đã được bao phủ bằng Equivalence Partitioning (ECP) và Boundary Value Analysis (BVA). Tuy nhiên, điều đó không có nghĩa Decision Table không áp dụng được. Vấn đề là áp dụng Decision Table không giúp phát hiện thêm lỗi mà các test case hiện tại chưa kiểm tra.
