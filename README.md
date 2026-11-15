@@ -964,3 +964,288 @@ Bảng Test Coverage Matrix:
 | Check-out Date at boundary            | TC-012       | BVA              |
 | Check-out Date above boundary         | TC-013       | BVA              |
 
+### State Transition Testing
+
+#### E-commerce Order Management System
+
+**Project Overview**
+
+- Project Name: E-Commerce Order Management System (OMS)
+- Module: Order Lifecycle Management
+- Testing Technique: State Transition Testing
+- Business Context: Một công ty thương mại điện tử đang phát triển hệ thống quản lý đơn hàng. Sau khi khách hàng đặt hàng thành công, đơn hàng sẽ trải qua nhiều trạng thái tùy thuộc vào quá trình thanh toán, xử lý tại kho, vận chuyển và giao hàng. Hệ thống cho phép khách hàng hủy đơn trong một số giai đoạn nhất định. Ngoài ra, nếu đơn hàng đã thanh toán nhưng bị hủy, hệ thống phải thực hiện hoàn tiền.
+
+**Software Requirements Specification (SRS)**
+
+*BR-01. Order Creation*
+
+- Khi khách hàng đặt hàng thành công, hệ thống tạo một đơn hàng có trạng thái ban đầu là `PENDING_PAYMENT`.
+- Mỗi đơn hàng có một mã `Order ID` duy nhất.
+
+*BR-02. Payment Processing*
+
+- Khi đơn hàng ở trạng thái `PENDING_PAYMENT`:
+  - Nếu thanh toán thành công, đơn hàng chuyển sang `PAID`.
+  - Nếu thanh toán thất bại, đơn hàng vẫn ở `PENDING_PAYMENT` để khách hàng thử lại.
+  - Nếu không thanh toán trong vòng 30 phút kể từ khi tạo đơn, đơn hàng tự động chuyển sang `CANCELLED`.
+- Khi đơn hàng đã `PAID`, hệ thống không được ghi nhận thêm một lần thanh toán thành công cho cùng đơn hàng.
+
+*BR-03. Order Processing*
+
+- Khi đơn hàng ở trạng thái `PAID`, nhân viên kho có thể xác nhận bắt đầu xử lý đơn hàng.
+- Đơn hàng chuyển sang `PROCESSING`.
+- Sau khi đóng gói hoàn tất, đơn hàng chuyển sang `READY_TO_SHIP`.
+
+*BR-04. Shipping*
+
+- Khi đơn hàng ở trạng thái `READY_TO_SHIP`, nhân viên vận chuyển có thể xác nhận bàn giao đơn hàng.
+- Đơn hàng chuyển sang `SHIPPED`.
+- Khi giao hàng thành công, đơn hàng chuyển sang `DELIVERED`.
+
+*BR-05. Order Cancellation*
+
+- Khách hàng được phép hủy đơn khi đơn hàng đang ở một trong các trạng thái: `PENDING_PAYMENT`, `PAID`, `PROCESSING`.
+- Quy tắc xử lý:
+  - Nếu đơn hàng chưa thanh toán (`PENDING_PAYMENT`), hủy đơn sẽ chuyển trực tiếp sang `CANCELLED`.
+  - Nếu đơn hàng đã thanh toán (`PAID` hoặc `PROCESSING`), hủy đơn sẽ chuyển sang `REFUND_PENDING` để chờ hoàn tiền.
+  - Nếu hoàn tiền thành công, đơn hàng chuyển sang `REFUNDED`.
+  - Nếu hoàn tiền thất bại, đơn hàng vẫn ở `REFUND_PENDING` để hệ thống thử lại.
+- Khách hàng không được phép hủy đơn khi trạng thái là `READY_TO_SHIP`, `SHIPPED`, `DELIVERED`, `CANCELLED`, `REFUND_PENDING` hoặc `REFUNDED`.
+
+*BR-06. Invalid State Transition*
+
+- Nếu người dùng hoặc hệ thống gửi một yêu cầu chuyển trạng thái không hợp lệ:
+  - Hệ thống phải từ chối yêu cầu.
+  - Trạng thái đơn hàng phải giữ nguyên.
+  - Không được tạo ra tác động phụ không hợp lệ, chẳng hạn ghi nhận thêm thanh toán, tạo yêu cầu hoàn tiền hoặc bàn giao hàng.
+  - API trả về HTTP `409 Conflict` với thông báo `Invalid order state transition`.
+- Quy định này áp dụng cho các yêu cầu thay đổi trạng thái không hợp lệ; không áp dụng cho thanh toán thất bại hoặc hoàn tiền thất bại đã được định nghĩa là những kết quả nghiệp vụ hợp lệ.
+
+*BR-07. Terminal States*
+
+- Các trạng thái sau được xem là trạng thái kết thúc: `CANCELLED`, `DELIVERED`, `REFUNDED`.
+- Một khi đơn hàng đã ở trạng thái kết thúc, không được chuyển sang bất kỳ trạng thái nào khác.
+
+*BR-08. Operational Assumptions*
+
+- Để bài tập có thể kiểm thử một cách xác định, dự án thống nhất thêm các giả định:
+  - Các sự kiện được xử lý tuần tự theo thời điểm hệ thống chấp nhận.
+  - Payment Success và Refund Success chỉ được xử lý khi đơn hàng đang ở trạng thái cho phép tương ứng.
+  - Các thao tác không hợp lệ không làm thay đổi dữ liệu nghiệp vụ.
+  - Việc thanh toán, hoàn tiền và vận chuyển được mô phỏng bằng các dịch vụ giả lập (mock services) trong môi trường test.
+  - Mỗi test case có thể bắt đầu từ một đơn hàng được chuẩn bị sẵn ở trạng thái cần kiểm tra.
+
+Hãy thiết kể bảng test case đầy đủ, và xác định ít nhất năm lỗi có thể xảy ra nếu lập trình viên triển khai sai logic trạng thái.
+
+**LỜI GIẢI CHI TIẾT**
+
+State Transition Testing là một kỹ thuật Black Box Testing dựa trên mô hình, dùng để kiểm tra hành vi của hệ thống khi nó chuyển từ trạng thái này sang trạng thái khác dưới tác động của các sự kiện.
+
+Ví dụ: `PENDING_PAYMENT + Payment Success → PAID`. Trong đó:
+
+- Current State: `PENDING_PAYMENT`
+- Event: `Payment Success`
+- Next State: `PAID`
+
+Một chuyển đổi không hợp lệ có thể là: `DELIVERED + Cancel Order → Rejected`. Trong trường hợp này, hệ thống không được chuyển sang `CANCELLED`.
+
+Sự phân biệt giữa các khái niệm State, Event, Transition và Guard được trình bày trong bảng sau:
+
+| Thuật ngữ  | Ý nghĩa                                           | Ví dụ                   |
+| ---------- | ------------------------------------------------- | ----------------------- |
+| State      | Trạng thái hiện tại của đối tượng                 | `PAID`                  |
+| Event      | Sự kiện tác động lên đối tượng                    | `Cancel Order`          |
+| Transition | Chuyển đổi từ trạng thái này sang trạng thái khác | `PAID → REFUND_PENDING` |
+| Guard      | Điều kiện cần thỏa mãn để chuyển đổi              | Order đang ở `PAID`     |
+| Action     | Hành động thực hiện khi xử lý sự kiện             | Tạo yêu cầu hoàn tiền   |
+
+> Một Event không nhất thiết phải làm thay đổi State.
+
+Ví dụ: `PENDING_PAYMENT + Payment Failed → PENDING_PAYMENT`
+
+Đây là một chuyển đổi tự quay lại trạng thái cũ (*self-transition*), nhưng hệ thống vẫn phải xử lý kết quả thanh toán thất bại.
+
+Tương tự: `REFUND_PENDING + Refund Failed → REFUND_PENDING`
+
+Đây là hành vi hợp lệ theo yêu cầu, không phải Invalid Transition.
+
+Các mức độ bao phủ được trình bày trong bảng sau:
+
+| Coverage                     | Ý nghĩa                                                            |
+| ---------------------------- | ------------------------------------------------------------------ |
+| State Coverage               | Mỗi trạng thái được đi qua ít nhất một lần                         |
+| Valid Transition Coverage    | Mỗi chuyển đổi hợp lệ được thực hiện ít nhất một lần               |
+| Invalid Transition Coverage  | Các chuyển đổi không hợp lệ được kiểm tra theo phạm vi xác định    |
+| Transition Pair Coverage     | Mỗi cặp chuyển đổi hợp lệ liên tiếp được thực hiện ít nhất một lần |
+| Transition Sequence Coverage | Kiểm tra các chuỗi chuyển đổi có độ dài được xác định              |
+
+State Coverage yếu hơn Transition Coverage: đi qua tất cả trạng thái không đồng nghĩa đã kiểm thử tất cả cách chuyển đến hoặc rời khỏi từng trạng thái.
+
+Từ tài liệu SRS, ta xác định được 9 trạng thái trong bảng sau:
+
+| State ID | State Name      | Description                | Type         |
+| -------- | --------------- | -------------------------- | ------------ |
+| S1       | PENDING_PAYMENT | Chờ thanh toán             | Non-terminal |
+| S2       | PAID            | Đã thanh toán              | Non-terminal |
+| S3       | PROCESSING      | Đang xử lý tại kho         | Non-terminal |
+| S4       | READY_TO_SHIP   | Đã đóng gói, sẵn sàng giao | Non-terminal |
+| S5       | SHIPPED         | Đã bàn giao vận chuyển     | Non-terminal |
+| S6       | DELIVERED       | Đã giao hàng thành công    | Terminal     |
+| S7       | CANCELLED       | Đã hủy khi chưa thanh toán | Terminal     |
+| S8       | REFUND_PENDING  | Đang chờ hoàn tiền         | Non-terminal |
+| S9       | REFUNDED        | Đã hoàn tiền thành công    | Terminal     |
+
+Danh sách sự kiện được trình bày trong bảng sau:
+
+| Event ID | Event               |
+| -------- | ------------------- |
+| E1       | Payment Success     |
+| E2       | Payment Failed      |
+| E3       | Payment Timeout     |
+| E4       | Start Processing    |
+| E5       | Finish Packing      |
+| E6       | Handover to Carrier |
+| E7       | Delivery Success    |
+| E8       | Cancel Order        |
+| E9       | Refund Success      |
+| E10      | Refund Failed       |
+
+Bảng State Transition Table được trình bày như sau:
+
+| Transition ID | Current State   | Event               | Next State      | Expected Action                 |
+| ------------- | --------------- | ------------------- | --------------- | ------------------------------- |
+| T01           | PENDING_PAYMENT | Payment Success     | PAID            | Ghi nhận thanh toán             |
+| T02           | PENDING_PAYMENT | Payment Failed      | PENDING_PAYMENT | Thông báo thất bại, cho thử lại |
+| T03           | PENDING_PAYMENT | Payment Timeout     | CANCELLED       | Hủy đơn khi đủ 30 phút          |
+| T04           | PENDING_PAYMENT | Cancel Order        | CANCELLED       | Hủy đơn, không hoàn tiền        |
+| T05           | PAID            | Start Processing    | PROCESSING      | Bắt đầu xử lý tại kho           |
+| T06           | PAID            | Cancel Order        | REFUND_PENDING  | Tạo yêu cầu hoàn tiền           |
+| T07           | PROCESSING      | Finish Packing      | READY_TO_SHIP   | Xác nhận đóng gói               |
+| T08           | PROCESSING      | Cancel Order        | REFUND_PENDING  | Tạo yêu cầu hoàn tiền           |
+| T09           | READY_TO_SHIP   | Handover to Carrier | SHIPPED         | Ghi nhận bàn giao               |
+| T10           | SHIPPED         | Delivery Success    | DELIVERED       | Xác nhận giao thành công        |
+| T11           | REFUND_PENDING  | Refund Success      | REFUNDED        | Ghi nhận hoàn tiền              |
+| T12           | REFUND_PENDING  | Refund Failed       | REFUND_PENDING  | Ghi nhận thất bại, chờ thử lại  |
+
+Ta có 12 valid transitions. Trong đó, T02 và T12 là các self-transitions.
+
+Bảng Invalid Transition Table được trình bày như sau:
+
+| Invalid ID | Current State   | Event               | Expected Result             |
+| ---------- | --------------- | ------------------- | --------------------------- |
+| IT01       | PAID            | Payment Success     | Reject, giữ PAID            |
+| IT02       | PROCESSING      | Payment Success     | Reject, giữ PROCESSING      |
+| IT03       | READY_TO_SHIP   | Cancel Order        | Reject, giữ READY_TO_SHIP   |
+| IT04       | SHIPPED         | Cancel Order        | Reject, giữ SHIPPED         |
+| IT05       | DELIVERED       | Cancel Order        | Reject, giữ DELIVERED       |
+| IT06       | CANCELLED       | Payment Success     | Reject, giữ CANCELLED       |
+| IT07       | REFUNDED        | Refund Success      | Reject, giữ REFUNDED        |
+| IT08       | PENDING_PAYMENT | Start Processing    | Reject, giữ PENDING_PAYMENT |
+| IT09       | PAID            | Handover to Carrier | Reject, giữ PAID            |
+| IT10       | SHIPPED         | Refund Success      | Reject, giữ SHIPPED         |
+
+Ta không cần liệt kê mọi cặp State–Event không hợp lệ ngay lập tức. Trước tiên, chọn các trường hợp có rủi ro nghiệp vụ cao. Mỗi trường hợp phải trả về HTTP `409 Conflict`, thông báo `Invalid order state transition` và không phát sinh tác động phụ không hợp lệ.
+
+Tập đường đi sau có thể bao phủ toàn bộ 12 chuyển đổi theo All Valid Transitions Coverage:
+
+| Path | Transition Sequence               |
+| ---- | --------------------------------- |
+| P1   | T02 → T01 → T05 → T07 → T09 → T10 |
+| P2   | T03                               |
+| P3   | T04                               |
+| P4   | T01 → T06 → T12 → T11             |
+| P5   | T01 → T05 → T08 → T11             |
+
+Transition Pair Coverage kiểm tra các cặp chuyển đổi hợp lệ có thể diễn ra liên tiếp. Để không bỏ sót, ta có thể lập bảng các cặp chuyển đổi dựa trên trạng thái đích của chuyển đổi thứ nhất và trạng thái nguồn của chuyển đổi thứ hai:
+
+| First Transition | Possible Next Transitions |
+| ---------------- | ------------------------- |
+| T01              | T05, T06                  |
+| T02              | T01, T02, T03, T04        |
+| T03              | Không có                  |
+| T04              | Không có                  |
+| T05              | T07, T08                  |
+| T06              | T11, T12                  |
+| T07              | T09                       |
+| T08              | T11, T12                  |
+| T09              | T10                       |
+| T10              | Không có                  |
+| T11              | Không có                  |
+| T12              | T11, T12                  |
+
+Vậy có **16 cặp chuyển đổi hợp lệ** theo mô hình này. Một bộ test đạt 100% Valid Transition Coverage chưa chắc đạt 100% Transition Pair Coverage. Ví dụ, T01 và T06 có thể đều được thực hiện, nhưng cặp `T01 → T06` chưa chắc đã xuất hiện trong một chuỗi kiểm thử.
+
+Để test case dễ thực thi, ta sử dụng các dữ liệu mẫu:
+
+| Field                  | Test Data           |
+| ---------------------- | ------------------- |
+| Customer ID            | CUST001             |
+| Order ID               | ORD1001 đến ORD1030 |
+| Order Amount           | 1,500,000 VND       |
+| Payment Method         | Bank Transfer       |
+| Payment Transaction ID | PAY001              |
+| Refund Transaction ID  | REF001              |
+| Carrier                | GHN                 |
+| Warehouse Staff        | WH001               |
+| Shipping Staff         | SH001               |
+
+Valid Transition Test Cases:
+
+| TC ID     | Description             | Preconditions                            | Test Data                       | Test Steps                                                                      | Expected Result                                                                   |
+| --------- | ----------------------- | ---------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| TC-ST-001 | Thanh toán thành công   | Order ở PENDING_PAYMENT                  | ORD1001; PAY001; 1,500,000 VND  | 1. Mở ORD1001. 2. Giả lập Payment Success. 3. Kiểm tra trạng thái và giao dịch. | Order chuyển PAID; thanh toán được ghi nhận một lần                               |
+| TC-ST-002 | Thanh toán thất bại     | Order ở PENDING_PAYMENT                  | ORD1002; Payment Failed         | 1. Mở ORD1002. 2. Giả lập Payment Failed. 3. Kiểm tra trạng thái.               | Order vẫn PENDING_PAYMENT; cho phép thử lại; không ghi nhận thanh toán thành công |
+| TC-ST-003 | Hết hạn thanh toán      | Order ở PENDING_PAYMENT; chưa thanh toán | ORD1003; elapsed time = 30 phút | 1. Tạo đơn. 2. Giả lập thời gian đạt mốc 30 phút. 3. Chạy xử lý timeout.        | Order chuyển CANCELLED; không tạo yêu cầu hoàn tiền                               |
+| TC-ST-004 | Hủy đơn chưa thanh toán | Order ở PENDING_PAYMENT                  | ORD1004; Cancel Order           | 1. Mở ORD1004. 2. Chọn Cancel Order. 3. Xác nhận hủy.                           | Order chuyển CANCELLED; không tạo yêu cầu hoàn tiền                               |
+| TC-ST-005 | Bắt đầu xử lý đơn       | Order ở PAID                             | ORD1005; WH001                  | 1. Mở ORD1005. 2. Chọn Start Processing.                                        | Order chuyển PROCESSING                                                           |
+| TC-ST-006 | Hủy đơn đã thanh toán   | Order ở PAID                             | ORD1006; Cancel Order           | 1. Mở ORD1006. 2. Chọn Cancel Order. 3. Xác nhận.                               | Order chuyển REFUND_PENDING; tạo yêu cầu hoàn tiền                                |
+| TC-ST-007 | Hoàn tất đóng gói       | Order ở PROCESSING                       | ORD1007; WH001                  | 1. Mở ORD1007. 2. Chọn Finish Packing.                                          | Order chuyển READY_TO_SHIP                                                        |
+| TC-ST-008 | Hủy đơn đang xử lý      | Order ở PROCESSING                       | ORD1008; Cancel Order           | 1. Mở ORD1008. 2. Chọn Cancel Order.                                            | Order chuyển REFUND_PENDING; tạo yêu cầu hoàn tiền                                |
+| TC-ST-009 | Bàn giao vận chuyển     | Order ở READY_TO_SHIP                    | ORD1009; Carrier = GHN          | 1. Mở ORD1009. 2. Chọn Handover to Carrier.                                     | Order chuyển SHIPPED; ghi nhận bàn giao                                           |
+| TC-ST-010 | Giao hàng thành công    | Order ở SHIPPED                          | ORD1010; Delivery Success       | 1. Mở ORD1010. 2. Giả lập Delivery Success.                                     | Order chuyển DELIVERED                                                            |
+| TC-ST-011 | Hoàn tiền thành công    | Order ở REFUND_PENDING                   | ORD1011; REF001                 | 1. Mở ORD1011. 2. Giả lập Refund Success.                                       | Order chuyển REFUNDED; ghi nhận hoàn tiền                                         |
+| TC-ST-012 | Hoàn tiền thất bại      | Order ở REFUND_PENDING                   | ORD1012; Refund Failed          | 1. Mở ORD1012. 2. Giả lập Refund Failed.                                        | Order vẫn REFUND_PENDING; ghi nhận thất bại; có thể thử lại                       |
+
+Invalid Transition Test Cases:
+
+| TC ID     | Description                        | Preconditions           | Test Data                    | Test Steps                                                                     | Expected Result                                                      |
+| --------- | ---------------------------------- | ----------------------- | ---------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| TC-ST-013 | Thanh toán lại đơn đã PAID         | Order ở PAID            | ORD1013; Payment Success     | 1. Gửi Payment Success lần nữa. 2. Kiểm tra response, trạng thái và giao dịch. | HTTP 409; trạng thái PAID giữ nguyên; không ghi nhận thêm thanh toán |
+| TC-ST-014 | Thanh toán khi đơn đang PROCESSING | Order ở PROCESSING      | ORD1014; Payment Success     | 1. Gửi Payment Success. 2. Kiểm tra response và dữ liệu.                       | HTTP 409; giữ PROCESSING; không ghi nhận thêm thanh toán             |
+| TC-ST-015 | Hủy đơn đã READY_TO_SHIP           | Order ở READY_TO_SHIP   | ORD1015; Cancel Order        | 1. Gửi Cancel Order. 2. Kiểm tra response.                                     | HTTP 409; giữ READY_TO_SHIP; không tạo refund                        |
+| TC-ST-016 | Hủy đơn đã SHIPPED                 | Order ở SHIPPED         | ORD1016; Cancel Order        | 1. Gửi Cancel Order. 2. Kiểm tra response.                                     | HTTP 409; giữ SHIPPED; không tạo refund                              |
+| TC-ST-017 | Hủy đơn đã DELIVERED               | Order ở DELIVERED       | ORD1017; Cancel Order        | 1. Gửi Cancel Order. 2. Kiểm tra response.                                     | HTTP 409; giữ DELIVERED                                              |
+| TC-ST-018 | Thanh toán đơn đã CANCELLED        | Order ở CANCELLED       | ORD1018; Payment Success     | 1. Gửi Payment Success. 2. Kiểm tra response và dữ liệu.                       | HTTP 409; giữ CANCELLED; không ghi nhận thanh toán                   |
+| TC-ST-019 | Hoàn tiền lại đơn đã REFUNDED      | Order ở REFUNDED        | ORD1019; Refund Success      | 1. Gửi Refund Success lần nữa. 2. Kiểm tra response và giao dịch.              | HTTP 409; giữ REFUNDED; không ghi nhận thêm hoàn tiền                |
+| TC-ST-020 | Xử lý đơn chưa thanh toán          | Order ở PENDING_PAYMENT | ORD1020; Start Processing    | 1. Gửi Start Processing. 2. Kiểm tra response.                                 | HTTP 409; giữ PENDING_PAYMENT                                        |
+| TC-ST-021 | Bàn giao đơn chưa xử lý            | Order ở PAID            | ORD1021; Handover to Carrier | 1. Gửi Handover to Carrier. 2. Kiểm tra response.                              | HTTP 409; giữ PAID; không ghi nhận bàn giao                          |
+| TC-ST-022 | Hoàn tiền đơn đang vận chuyển      | Order ở SHIPPED         | ORD1022; Refund Success      | 1. Gửi Refund Success. 2. Kiểm tra response.                                   | HTTP 409; giữ SHIPPED; không ghi nhận hoàn tiền                      |
+
+Các test case đơn lẻ phía trên chủ yếu kiểm tra một chuyển đổi tại một thời điểm. Để kiểm tra hành vi xuyên suốt, ta cần thêm các test cases kiểm tra chuỗi chuyển đổi:
+
+| TC ID     | Description                                   | Preconditions               | Test Steps                                                                        | Expected Result                                                                  |
+| --------- | --------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| TC-ST-023 | Hoàn tất toàn bộ vòng đời đơn hàng            | Order mới ở PENDING_PAYMENT | Payment Success → Start Processing → Finish Packing → Handover → Delivery Success | Trạng thái lần lượt: PAID → PROCESSING → READY_TO_SHIP → SHIPPED → DELIVERED     |
+| TC-ST-024 | Thanh toán thất bại rồi thanh toán thành công | Order ở PENDING_PAYMENT     | Payment Failed → Payment Success                                                  | Trạng thái: PENDING_PAYMENT → PAID; chỉ ghi nhận thanh toán thành công một lần   |
+| TC-ST-025 | Hủy đơn đang xử lý và hoàn tiền               | Order ở PENDING_PAYMENT     | Payment Success → Start Processing → Cancel Order → Refund Success                | Trạng thái: PAID → PROCESSING → REFUND_PENDING → REFUNDED                        |
+| TC-ST-026 | Hoàn tiền thất bại rồi thử lại thành công     | Order ở REFUND_PENDING      | Refund Failed → Refund Success                                                    | Trạng thái: REFUND_PENDING → REFUNDED; chỉ ghi nhận một lần hoàn tiền thành công |
+
+Bốn test case này giúp kiểm tra những chuỗi nghiệp vụ quan trọng. Tuy nhiên, chúng **chưa bảo đảm 100% Transition Pair Coverage** vì chưa bao phủ toàn bộ 16 cặp đã liệt kê. Muốn đạt 100%, cần đối chiếu từng cặp với các chuỗi thực thi và bổ sung các chuỗi còn thiếu.
+
+Phân tích các lỗi tiềm ẩn: Dưới đây là những lỗi thường gặp khi triển khai hệ thống quản lý trạng thái:
+
+| Defect ID | Potential Defect                                                 | Hậu quả                                     |
+| --------- | ---------------------------------------------------------------- | ------------------------------------------- |
+| BUG-01    | Đơn đã PAID vẫn cho phép Payment Success lần nữa                 | Nguy cơ ghi nhận thanh toán trùng           |
+| BUG-02    | Đơn SHIPPED vẫn cho phép Cancel Order                            | Hủy đơn khi hàng đã vận chuyển              |
+| BUG-03    | Đơn PAID bị hủy trực tiếp sang CANCELLED                         | Bỏ qua quy trình hoàn tiền                  |
+| BUG-04    | Refund Failed làm đơn chuyển REFUNDED                            | Hiển thị đã hoàn tiền dù giao dịch thất bại |
+| BUG-05    | Payment Timeout vẫn hủy đơn đã PAID                              | Mất tính nhất quán trạng thái               |
+| BUG-06    | Đơn DELIVERED vẫn có thể chuyển trạng thái                       | Vi phạm Terminal State                      |
+| BUG-07    | Đơn PENDING_PAYMENT được chuyển thẳng sang SHIPPED               | Bỏ qua thanh toán và xử lý kho              |
+| BUG-08    | Hai yêu cầu Cancel Order tạo hai refund requests                 | Nguy cơ hoàn tiền trùng                     |
+| BUG-09    | Payment Success đến trễ sau khi đơn CANCELLED vẫn được chấp nhận | Đơn đã hủy nhưng phát sinh thanh toán       |
+| BUG-10    | API trả 409 nhưng vẫn cập nhật dữ liệu                           | Trạng thái và phản hồi API không nhất quán  |
+
+Trong thực tế, BUG-08 và BUG-09 đặc biệt đáng quan tâm vì chúng liên quan đến xử lý bất đồng bộ và các yêu cầu đến gần như đồng thời.
+
