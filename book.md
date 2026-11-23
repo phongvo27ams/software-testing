@@ -1249,3 +1249,54 @@ Phân tích các lỗi tiềm ẩn: Dưới đây là những lỗi thường g�
 
 Trong thực tế, BUG-08 và BUG-09 đặc biệt đáng quan tâm vì chúng liên quan đến xử lý bất đồng bộ và các yêu cầu đến gần như đồng thời.
 
+
+---
+
+::: info NOTE
+**Ghi chú:** Trong kiểm thử hộp đen (Black Box Testing), người kiểm thử không cần biết cấu trúc mã nguồn bên trong mà tập trung vào đặc tả đầu vào và đầu ra của hệ thống.
+:::
+
+::: tip TIP
+**Mẹo thực hành:** Khi thiết kế test case cho các hệ thống có nhiều điều kiện kết hợp, hãy ưu tiên sử dụng **Decision Table** để tránh bỏ sót tổ hợp logic quan trọng.
+:::
+
+::: warning WARNING
+**Lưu ý:** Không nên chỉ kiểm thử các giá trị hợp lệ (happy path). Các lỗi nghiêm trọng thường xuất hiện ở giá trị biên hoặc các trạng thái chuyển đổi không hợp lệ.
+:::
+
+::: danger DANGER
+**Cảnh báo nghiêm trọng:** Bỏ qua kiểm thử đồng thời (concurrency) ở các luồng thanh toán và hoàn tiền có thể dẫn đến giao dịch trùng lặp hoặc sai lệch dữ liệu tài chính.
+:::
+
+```java
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class RoomBookingValidatorTest {
+
+  // Normal Boundary Value Analysis (BVA) test cases
+  @Test
+  void shouldAcceptValidBoundaryValues() {
+    RoomBookingValidator validator = new RoomBookingValidator();
+
+    assertTrue(validator.isValid(30, 25));   // Duration min
+    assertTrue(validator.isValid(180, 25));  // Duration max
+    assertTrue(validator.isValid(90, 1));    // Students min
+    assertTrue(validator.isValid(90, 50));   // Students max
+  }
+
+  @Test
+  void shouldRejectOutOfRangeValues() {
+    RoomBookingValidator validator = new RoomBookingValidator();
+
+    assertFalse(validator.isValid(29, 25));  // Duration < 30
+    assertFalse(validator.isValid(181, 25)); // Duration > 180
+    assertFalse(validator.isValid(90, 0));   // Students < 1
+    assertFalse(validator.isValid(90, 51));  // Students > 50
+
+    // Dòng code dài để kiểm tra tự động xuống dòng (word wrap)
+    String errorMessage = validator.validateWithDetailedMessage(181, 51, "Room booking request rejected because both duration (minutes) and number of students exceed the maximum allowed university policy limits.");
+    assertNotNull(errorMessage, "Expected a descriptive validation error message when multiple boundary constraints are violated simultaneously.");
+  }
+}
+```
