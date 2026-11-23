@@ -3,14 +3,15 @@ import path from 'node:path'
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: process.env.GITHUB_ACTIONS ? '/software-testing/' : '/',
   title: 'Software Testing',
   description: 'Giáo trình Kiểm thử Phần mềm',
   lang: 'vi-VN',
   ignoreDeadLinks: true,
 
-  // Phục vụ trực tiếp file book.md làm trang chủ (/)
+  // Phục vụ trực tiếp file README.md làm trang chủ (/)
   rewrites: {
-    'book.md': 'index.md'
+    'README.md': 'index.md'
   },
 
   vite: {
