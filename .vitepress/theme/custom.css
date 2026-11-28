@@ -14,9 +14,9 @@ html {
   --vp-c-brand-3: #1e40af;
   --vp-c-brand-soft: rgba(37, 99, 235, 0.1);
 
-  /* Nền giấy sáng nhẹ, chữ mặc định màu đen */
-  --vp-c-bg: #fcfcfd;
-  --vp-c-bg-alt: #f4f6f9;
+  /* Nền trắng thuần, chữ mặc định màu đen */
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f8fafc;
   --vp-c-bg-soft: #f1f5f9;
   --vp-c-text-1: #000000;
   --vp-c-text-2: #334155;
@@ -373,11 +373,16 @@ html {
   font-size: 1rem;
 }
 
-/* Danh sách liền mạch: bullet sát lề trái (0), khoảng cách bullet-text rộng đều mọi cấp (1–4) */
-.vp-doc ul,
+/* Danh sách liền mạch: bullet/number level 1 thẳng hàng với lề trái text, khoảng cách bullet-text rộng đều mọi cấp */
+.vp-doc ul {
+  margin: 0.6rem 0 1rem;
+  padding-left: 1.25rem !important;
+  list-style-position: outside !important;
+}
+
 .vp-doc ol {
   margin: 0.6rem 0 1rem;
-  padding-left: 1rem !important;
+  padding-left: 1.5rem !important;
   list-style-position: outside !important;
 }
 
@@ -387,11 +392,16 @@ html {
   padding-left: 0.75rem !important;
 }
 
-.vp-doc li > ul,
+.vp-doc li > ul {
+  margin-top: 0.25rem;
+  margin-bottom: 0.35rem;
+  padding-left: 1.25rem !important;
+}
+
 .vp-doc li > ol {
   margin-top: 0.25rem;
   margin-bottom: 0.35rem;
-  padding-left: 1rem !important;
+  padding-left: 1.5rem !important;
 }
 
 /* Ký hiệu bullet phân biệt theo từng cấp 1, 2, 3, 4 */
