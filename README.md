@@ -1,8 +1,128 @@
 # SOFTWARE TESTING
 
+# Software Testing Fundamentals
+
+## Basic Concepts of Software Testing
+
+### Definition of Software Testing and the Importance of Testing
+
+#### Quan niệm sai lầm về phạm vi của Kiểm thử phần mềm
+
+Trong một dự án xây dựng ứng dụng đặt xe công nghệ, đội ngũ phát triển (Developer) đang trong giai đoạn viết tài liệu đặc tả yêu cầu (SRS) và thiết kế giao diện (UI/UX). Bạn là một Kiểm thử viên (Tester) mới gia nhập dự án. Quản lý dự án (PM) nói với bạn rằng: "Hiện tại lập trình viên chưa viết xong dòng code nào cả, bạn cứ nghỉ ngơi hoặc đọc tài liệu cho biết, tháng sau có bản dựng (Build) rồi mới bắt đầu công việc kiểm thử."
+
+Yêu cầu:
+
+1. Dựa trên định nghĩa toàn diện về Kiểm thử phần mềm, phát biểu của Quản lý dự án đang bỏ sót mảng hoạt động nào của kiểm thử?
+2. Nếu bạn đồng ý với đề xuất của Quản lý dự án và chỉ bắt đầu làm việc khi đã có phần mềm chạy được, những rủi ro gì có thể xảy ra cho dự án? Hãy liệt kê ít nhất 3 hoạt động cụ thể bạn có thể thực hiện ngay tại thời điểm hiện tại để đóng góp vào chất lượng sản phẩm.
+
+**LỜI GIẢI CHI TIẾT**
+
+Theo định nghĩa chuẩn quốc tế (ISTQB Foundation Level), kiểm thử phần mềm không đơn thuần là việc "chạy thử phần mềm để tìm lỗi". Đó là một quy trình gồm nhiều hoạt động (lập kế hoạch, phân tích, thiết kế, thực thi, báo cáo) bao gồm cả kiểm thử tĩnh (Static Testing - xem xét tài liệu, mã nguồn mà không chạy chương trình) và kiểm thử động (Dynamic Testing - thực thi phần mềm trên môi trường máy tính), nhằm mục đích xác minh (Verification - làm đúng theo đặc tả kỹ thuật) và thẩm định (Validation - đáp ứng đúng nhu cầu thực tế của người dùng), đồng thời cung cấp thông tin về chất lượng sản phẩm cho các bên liên quan. Hơn nữa, theo nguyên lý kiểm thử số 3 (Early Testing - Kiểm thử sớm), các hoạt động kiểm thử nên được bắt đầu càng sớm càng tốt trong vòng đời phát triển phần mềm để tối ưu hóa thời gian và chi phí.
+
+1. Phát biểu của Quản lý dự án (PM) đang đánh đồng kiểm thử phần mềm chỉ là Kiểm thử động (Dynamic Testing) — tức là việc thực thi mã nguồn trên máy tính để tìm lỗi — mà hoàn toàn bỏ sót mảng Kiểm thử tĩnh (Static Testing) cũng như các hoạt động chuẩn bị kiểm thử ở giai đoạn đầu của vòng đời phát triển phần mềm (SDLC).
+2. Các rủi ro nếu bắt đầu muộn chờ đến khi có bản dựng (Build):
+- Các lỗ hổng về mặt logic nghiệp vụ hoặc sự mâu thuẫn trong tài liệu đặc tả (SRS) không được phát hiện sớm, dẫn đến việc lập trình viên viết code sai ngay từ đầu.
+- Chi phí sửa lỗi tăng cao gấp nhiều lần do phải sửa lại cả tài liệu, thiết kế lẫn mã nguồn.
+- Trễ tiến độ dự án vì đội ngũ kiểm thử không có đủ thời gian tìm hiểu nghiệp vụ và chuẩn bị kịch bản kiểm thử trước khi nhận bản dựng.
+
+3 hoạt động cụ thể Tester cần thực hiện ngay tại thời điểm hiện tại:
+
+- Thực hiện Kiểm thử tĩnh (Review tài liệu): Đọc và phân tích tài liệu đặc tả yêu cầu (SRS) và bản thiết kế giao diện (UI/UX) để phát hiện các điểm mơ hồ, thiếu sót, mâu thuẫn hoặc không khả thi (ví dụ: quy trình đặt xe thiếu bước xử lý khi tài xế hủy chuyến giữa chừng).
+- Lập kế hoạch kiểm thử (Test Planning): Phối hợp với PM để xác định phạm vi kiểm thử, ước lượng thời gian, nguồn lực, môi trường kiểm thử và các rủi ro tiềm ẩn của dự án.
+- Phân tích và Thiết kế kiểm thử (Test Analysis & Design): Xác định các điều kiện kiểm thử (Test Conditions), viết trước các kịch bản kiểm thử (Test Cases) và chuẩn bị dữ liệu kiểm thử (Test Data) dựa trên tài liệu yêu cầu đã được phê duyệt.
+
+#### Phân biệt Verification (Xác minh) và Validation (Thẩm định) trong định nghĩa kiểm thử
+
+Một khách hàng đặt hàng công ty bạn xây dựng tính năng "Chuyển tiền nhanh" trên ứng dụng ngân hàng số.
+
+- Tài liệu đặc tả yêu cầu (SRS) ghi rõ: "Người dùng nhập số tài khoản nhận, nhập số tiền, bấm Xác nhận. Hệ thống thực hiện trừ tiền tài khoản gửi và cộng tiền tài khoản nhận ngay lập tức."
+- Lập trình viên đã lập trình chính xác 100% theo tài liệu SRS này: hệ thống chạy mượt mà, không phát sinh lỗi kỹ thuật, giao dịch hoàn tất trong 1 giây.
+- Tuy nhiên, khi đưa sản phẩm cho khách hàng nghiệm thu, khách hàng từ chối nhận sản phẩm vì hệ thống không có bước nhập mã xác thực (OTP) hoặc sinh trắc học trước khi trừ tiền, gây mất an toàn tài chính nghiêm trọng cho người dùng cuối.
+
+Yêu cầu:
+
+1. Xét theo định nghĩa của Kiểm thử phần mềm, sản phẩm trên đã đạt tiêu chuẩn về mặt Verification hay Validation? Giải thích rõ lý do.
+2. Qua tình huống này, bạn rút ra kết luận gì về vai trò của kiểm thử phần mềm đối với việc đảm bảo sự thành công của một sản phẩm?
+
+**LỜI GIẢI CHI TIẾT**
+
+1. Sản phẩm trên đã đạt tiêu chuẩn về mặt Verification (Xác minh), nhưng thất bại hoàn toàn về mặt Validation (Thẩm định). Định nghĩa kiểm thử phần mềm nhấn mạnh hai mục tiêu cốt lõi song hành:
+- Verification (Xác minh - "Are we building the product right?"): Là quá trình đánh giá xem hệ thống có tuân thủ đúng các yêu cầu kỹ thuật và tài liệu đặc tả đã đề ra ở giai đoạn trước hay không. Trong tình huống này, lập trình viên đã làm đúng 100% những gì được viết trong tài liệu SRS, hệ thống không có lỗi kỹ thuật, do đó Verification đạt yêu cầu.
+- Validation (Thẩm định - "Are we building the right product?"): Là quá trình đánh giá xem hệ thống thực tế có đáp ứng được nhu cầu, mong đợi và giải quyết được bài toán thực tiễn của người dùng cuối hay không. Một ứng dụng ngân hàng thiếu bước xác thực bảo mật (OTP/sinh trắc học) là không an toàn và không thể đưa vào sử dụng thực tế, do đó Validation thất bại.
+
+2. Kiểm thử phần mềm không chỉ là công cụ kiểm tra sự tuân thủ máy móc theo văn bản, mà còn đóng vai trò như một bộ lọc chất lượng mang tính phản biện nghiệp vụ. Kiểm thử viên phải đứng ở góc độ của người dùng cuối và bối cảnh vận hành thực tế để đặt câu hỏi về tính hợp lý và an toàn của sản phẩm, ngay cả khi tài liệu đặc tả có sự thiếu sót. Một sản phẩm chỉ thực sự có chất lượng khi thỏa mãn đồng thời cả Verification và Validation.
+
+#### Phân tích hệ quả kinh tế và danh tiếng từ lỗi phần mềm
+
+Giả sử bạn đang làm việc cho một sàn thương mại điện tử lớn chuẩn bị bước vào chiến dịch siêu giảm giá lớn nhất năm. Nhóm phát triển vừa hoàn thiện tính năng "Áp dụng mã giảm giá tự động" vào sát giờ mở bán. Do áp lực tiến độ, nhóm quyết định bỏ qua giai đoạn kiểm thử tích hợp (Integration Testing) và kiểm thử hiệu năng (Performance Testing). Khi chiến dịch bắt đầu, hai sự cố xảy ra đồng thời:
+
+- Sự cố A: Hệ thống cho phép người dùng áp dụng chồng chéo nhiều mã giảm giá 50% trên cùng một đơn hàng, dẫn đến giá trị đơn hàng về 0 đồng. Trong 30 phút đầu tiên, có 5.000 đơn hàng 0 đồng được đặt thành công.
+- Sự cố B: Lượng truy cập tăng đột biến làm sập cổng thanh toán, khiến khách hàng bị trừ tiền trong tài khoản ngân hàng nhưng trạng thái đơn hàng trên sàn vẫn báo "Chưa thanh toán".
+
+Yêu cầu: Hãy phân tích tầm quan trọng của kiểm thử phần mềm thông qua việc đánh giá 4 khía cạnh thiệt hại mà doanh nghiệp phải gánh chịu từ hai sự cố trên:
+1. Thiệt hại trực tiếp về mặt tài chính.
+2. Thiệt hại về uy tín thương hiệu và lòng tin của khách hàng.
+3. Chi phí khắc phục sự cố (so sánh chi phí sửa lỗi lúc này với chi phí nếu phát hiện lỗi ở giai đoạn kiểm thử trước khi phát hành).
+4. Rủi ro về mặt pháp lý và tuân thủ quy định (nếu có).
+
+**LỜI GIẢI CHI TIẾT**
+
+Trong kỹ thuật phần mềm, tầm quan trọng của kiểm thử được chứng minh qua việc ngăn ngừa các lỗi nghiêm trọng lọt ra môi trường vận hành thực tế (Production). Khi phần mềm được sử dụng trong các hoạt động kinh doanh cốt lõi, một khiếm khuyết nhỏ cũng có thể dẫn đến thiệt hại tài chính khổng lồ, sụp đổ uy tín thương hiệu, mất thị phần và vi phạm pháp luật. Đồng thời, theo mô hình kinh tế học trong kiểm thử, chi phí sửa lỗi tăng theo cấp số nhân qua từng giai đoạn của dự án (chi phí sửa lỗi sau khi phát hành có thể cao gấp 10 đến 100 lần so với khi phát hiện ở giai đoạn kiểm thử).
+
+Phân tích 4 khía cạnh thiệt hại của doanh nghiệp:
+
+1. Thiệt hại trực tiếp về mặt tài chính:
+- Doanh nghiệp mất trắng doanh thu và chịu lỗ vốn trực tiếp trên 5.000 đơn hàng giá trị 0 đồng (nếu buộc phải giao hàng để giữ uy tín) hoặc tốn chi phí vận hành khổng lồ để rà soát và hủy đơn thủ công.
+- Mất trắng cơ hội bán hàng (doanh thu kỳ vọng) trong suốt thời gian cổng thanh toán bị sập ngay tại khung giờ vàng của chiến dịch lớn nhất năm.
+2. Thiệt hại về uy tín thương hiệu và lòng tin của khách hàng:
+- Khách hàng bị trừ tiền ngân hàng nhưng đơn hàng báo chưa thanh toán sẽ rơi vào trạng thái hoang mang, bức xúc và mất niềm tin nghiêm trọng vào tính an toàn, minh bạch của sàn thương mại điện tử.
+- Khách hàng rời bỏ nền tảng để chuyển sang đối thủ cạnh tranh, kéo theo làn sóng đánh giá tiêu cực trên mạng xã hội, làm giảm giá trị thương hiệu mà doanh nghiệp đã tốn nhiều ngân sách tiếp thị để xây dựng.
+3. Chi phí khắc phục sự cố:
+- Thay vì chỉ tốn một khoản chi phí nhỏ cho nhân sự kiểm thử chạy kiểm tra tích hợp và giả lập tải trước ngày mở bán, doanh nghiệp giờ đây phải huy động toàn bộ đội ngũ kỹ thuật trực chiến khẩn cấp (OT) để vá lỗi nóng (Hotfix) dưới áp lực cực lớn.
+- Phát sinh thêm chi phí khổng lồ cho bộ phận Chăm sóc khách hàng (CSKH) để giải quyết hàng nghìn khiếu nại, đối soát giao dịch thủ công với các ngân hàng liên kết và hoàn tiền cho khách hàng.
+4. Rủi ro về mặt pháp lý và tuân thủ quy định:
+- Nếu doanh nghiệp tự ý hủy 5.000 đơn hàng 0 đồng đã xác nhận thành công với khách hàng, doanh nghiệp có thể bị khởi kiện hoặc bị cơ quan quản lý thị trường xử phạt vì vi phạm Luật Bảo vệ quyền lợi người tiêu dùng (hành vi đơn phương hủy bỏ giao dịch đã xác lập).
+- Việc giữ tiền của khách hàng do lỗi cổng thanh toán nếu chậm trễ hoàn trả có thể vi phạm các quy định của Ngân hàng Nhà nước về trung gian thanh toán.
+
+#### Ra quyết định dựa trên thông tin chất lượng (Đánh giá mức độ sẵn sàng phát hành)
+
+Bạn là Tester duy nhất phụ trách kiểm thử một ứng dụng Quản lý đơn thuốc và nhắc lịch uống thuốc dành cho bệnh nhân cao tuổi. Trước ngày dự kiến phát hành (Release) 1 ngày, bạn tổng hợp được danh sách các lỗi (Bugs) còn tồn đọng như sau:
+
+- Lỗi 1: Màu sắc của nút "Lưu thông tin" hơi lệch tông xanh so với bản thiết kế gốc của đội ngũ UI/UX.
+- Lỗi 2: Khi người dùng thiết lập lịch uống thuốc vào lúc 12:00 trưa, hệ thống tự động lưu thành 12:00 đêm (00:00) do lỗi định dạng AM/PM.
+- Lỗi 3: Phần giới thiệu "Về chúng tôi" bị sai lỗi chính tả ở một từ tiếng Việt.
+- Lỗi 4: Ứng dụng bị văng (Crash) đột ngột khi người dùng cố gắng thêm từ loại thuốc thứ 5 trở đi vào danh sách quản lý hàng ngày.
+
+Yêu cầu:
+
+1. Dựa trên vai trò của kiểm thử là "cung cấp thông tin khách quan về mức độ chất lượng và rủi ro để hỗ trợ việc ra quyết định", bạn sẽ đưa ra khuyến nghị gì cho Quản lý dự án về việc Có nên phát hành sản phẩm vào ngày mai hay không?
+2. Hãy phân loại mức độ nghiêm trọng của 4 lỗi trên và giải thích tại sao việc kiểm thử kỹ lưỡng lại mang tính chất đặc biệt quan trọng đối với các phần mềm thuộc lĩnh vực y tế/chăm sóc sức khỏe như ứng dụng này.
+
+**LỜI GIẢI CHI TIẾT**
+
+Theo định nghĩa của ISTQB, một trong những mục tiêu quan trọng của kiểm thử là cung cấp thông tin khách quan, chính xác về mức độ chất lượng hiện tại và các rủi ro còn tồn đọng của đối tượng kiểm thử, giúp các bên liên quan (Stakeholders/PM) đưa ra quyết định sáng suốt (ví dụ: quyết định có cho phép phát hành sản phẩm hay không). Kiểm thử viên không phải là người tự ý cấm phát hành, nhưng có trách nhiệm phân tích rõ hậu quả của các lỗi chưa được sửa để bảo vệ dự án khỏi thảm họa vận hành.
+
+1. Khuyến nghị gửi Quản lý dự án: Khuyến nghị dứt khoát là KHÔNG NÊN PHÁT HÀNH (NO-GO) sản phẩm vào ngày mai. Cần trì hoãn ngày phát hành để đội ngũ phát triển khắc phục triệt để các lỗi nghiêm trọng và kiểm thử lại (Regression Testing).
+2. Phân loại mức độ nghiêm trọng (Severity) và giải thích tầm quan trọng trong lĩnh vực y tế:
+- Phân loại mức độ nghiêm trọng của 4 lỗi:
+  - Lỗi 2 (Sai định dạng giờ 12:00 trưa thành 00:00 đêm): Mức độ Nghiêm trọng cao nhất (Critical/Blocker). Lỗi làm sai lệch hoàn toàn chức năng cốt lõi của ứng dụng.
+  - Lỗi 4 (Ứng dụng bị Crash khi thêm từ loại thuốc thứ 5): Mức độ Nghiêm trọng (Major/High). Người cao tuổi thường mắc nhiều bệnh nền và phải uống trên 5 loại thuốc mỗi ngày; lỗi này khiến ứng dụng sụp đổ hoàn toàn và không thể sử dụng được với nhóm đối tượng mục tiêu.
+  - Lỗi 1 (Lệch tông màu nút bấm) & Lỗi 3 (Sai chính tả ở trang Giới thiệu): Mức độ Nhỏ/Thẩm mỹ (Minor/Trivial). Không làm gián đoạn chức năng chính và không gây rủi ro vận hành ngay lập tức (có thể chấp nhận phát hành nếu không còn lỗi nào khác, sau đó cập nhật ở phiên bản vá lỗi tiếp theo).
+- Tầm quan trọng đặc biệt trong lĩnh vực y tế/chăm sóc sức khỏe: Trong các hệ thống phần mềm y tế (Safety-critical systems), lỗi phần mềm không chỉ dừng lại ở thiệt hại tiền bạc mà ảnh hưởng trực tiếp đến sức khỏe và tính mạng con người. Cụ thể, Lỗi 2 khiến bệnh nhân cao tuổi uống thuốc sai thời điểm (uống thuốc ban ngày vào nửa đêm, hoặc bỏ lỡ liều thuốc buổi trưa), có thể dẫn đến ngộ độc thuốc, sốc phản vệ, tụt huyết áp hoặc biến chứng nguy hiểm đến tính mạng. Do đó, tiêu chuẩn chất lượng và sự nghiêm ngặt của kiểm thử trong lĩnh vực y tế luôn phải được đặt ở mức cao nhất.
+
+#### Vai trò của đội ngũ Kiểm thử viên (Tester) độc lập
+
+Nhiều lập trình viên có quan điểm rằng: "Nếu tôi viết code cẩn thận và tự kiểm tra (Unit Test) kỹ lưỡng thì không cần đến đội ngũ Kiểm thử viên (Tester) độc lập nữa." Hãy viết một đoạn lập luận ngắn gọn, thuyết phục (khoảng 150 - 200 từ) để phản biện lại quan điểm này.
+
+**LỜI GIẢI CHI TIẾT**
+
+Lập luận phản biện dựa trên Tâm lý học trong kiểm thử (Psychology of Testing) và tính chất Kiểm thử độc lập (Independence of Testing) trong Chương 1 của giáo trình ISTQB. Con người có xu hướng mắc phải thiên kiến xác nhận (Confirmation Bias) — tức là khó có thể tự nhìn ra sai sót trong chính sản phẩm do mình tạo ra. Ngoài ra, tư duy của lập trình viên là tư duy xây dựng (tập trung vào việc làm cho code chạy được), trong khi tư duy của kiểm thử viên là tư duy phản biện (tập trung vào việc tìm ra các kịch bản ngoại lệ làm hệ thống sụp đổ).
+
+Việc lập trình viên cẩn thận và thực hiện Unit Test kỹ lưỡng là điều vô cùng đáng quý, giúp đảm bảo chất lượng mã nguồn ngay từ cấp độ thành phần. Tuy nhiên, điều đó không thể thay thế hoàn toàn vai trò của đội ngũ Kiểm thử viên (Tester) độc lập. Về mặt tâm lý học, con người luôn tồn tại "thiên kiến xác nhận" — khi tự kiểm tra mã nguồn của chính mình, lập trình viên thường có xu hướng kiểm thử theo đúng những luồng logic mà họ đã lập trình, dẫn đến việc vô tình bỏ qua các trường hợp ngoại lệ hoặc các lỗ hổng phát sinh từ sự hiểu sai yêu cầu nghiệp vụ ban đầu. Hơn nữa, Unit Test chỉ kiểm tra từng hàm hoặc từng mô-đun riêng lẻ một cách cô lập, trong khi phần lớn các lỗi nghiêm trọng lại xuất hiện khi các mô-đun tích hợp với nhau hoặc dưới góc nhìn trải nghiệm tổng thể của người dùng cuối. Sự tham gia của Kiểm thử viên độc lập với góc nhìn khách quan, tư duy phản biện và không bị chi phối bởi giả định của người viết code chính là chốt chặn an toàn cần thiết để đảm bảo sản phẩm thực sự hoàn thiện trước khi đến tay khách hàng.
+
 # Test Design Techniques
 
-## Black Box Testing
+## Black-box Testing Techniques
 
 ### Boundary Value Analysis
 

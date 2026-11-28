@@ -373,15 +373,42 @@ html {
   font-size: 1rem;
 }
 
-/* Danh sách liền mạch, gọn gàng */
+/* Danh sách liền mạch: bullet sát lề trái (0), khoảng cách bullet-text rộng đều mọi cấp (1–4) */
 .vp-doc ul,
 .vp-doc ol {
   margin: 0.6rem 0 1rem;
+  padding-left: 1rem !important;
+  list-style-position: outside !important;
 }
 
 .vp-doc li {
   line-height: 1.62;
   font-size: 1rem;
+  padding-left: 0.75rem !important;
+}
+
+.vp-doc li > ul,
+.vp-doc li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.35rem;
+  padding-left: 1rem !important;
+}
+
+/* Ký hiệu bullet phân biệt theo từng cấp 1, 2, 3, 4 */
+.vp-doc ul {
+  list-style-type: disc !important;
+}
+
+.vp-doc ul ul {
+  list-style-type: circle !important;
+}
+
+.vp-doc ul ul ul {
+  list-style-type: square !important;
+}
+
+.vp-doc ul ul ul ul {
+  list-style-type: '–' !important;
 }
 
 .vp-doc li + li {
