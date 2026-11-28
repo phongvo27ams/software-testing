@@ -156,7 +156,66 @@ Bối cảnh 2 (Lĩnh vực Ngân hàng/Tài chính):
   - Defect kế thừa (tại giai đoạn lập trình): Công thức tính lãi suất interest = principal * 0.45 / 12 nằm trong mã nguồn của lập trình viên (được tạo ra do sao chép sai sót từ tài liệu SRS).
 - Failure (Sự cố vận hành): Khi kiểm thử viên thực thi giao dịch gửi 100 triệu đồng trên môi trường Staging, hệ thống hiển thị số tiền lãi sai lệch là 3.750.000 VNĐ (thay vì kết quả đúng theo nghiệp vụ ngân hàng là 375.000 VNĐ).
 
-Tình huống này chứng minh một nguyên lý quan trọng của ISTQB: Defect không chỉ tồn tại trong mã nguồn (Code), mà tồn tại trong mọi sản phẩm công việc (Work Products) của quy trình phát triển phần mềm — bao gồm tài liệu đặc tả yêu cầu (SRS), tài liệu thiết kế (Design), kịch bản kiểm thử (Test Cases) và hướng dẫn sử dụng. Việc thực hiện Kiểm thử tĩnh (Static Testing - rà soát tài liệu SRS) ngay từ đầu sẽ giúp phát hiện Defect này trước khi nó lây lan sang mã nguồn.
+Defect không chỉ tồn tại trong mã nguồn (Code), mà tồn tại trong mọi sản phẩm công việc (Work Products) của quy trình phát triển phần mềm — bao gồm tài liệu đặc tả yêu cầu (SRS), tài liệu thiết kế (Design), kịch bản kiểm thử (Test Cases) và hướng dẫn sử dụng. Việc thực hiện Kiểm thử tĩnh (Static Testing - rà soát tài liệu SRS) ngay từ đầu sẽ giúp phát hiện Defect này trước khi nó lây lan sang mã nguồn.
+
+#### Truy vết ngược từ hiện tượng
+
+Bối cảnh: Trong quá trình kiểm thử ứng dụng đặt vé máy bay, bạn phát hiện một hiện tượng bất thường trên giao diện: Khi người dùng chọn ngày đi là 20/11/2026 và bấm nút "Tìm chuyến bay", hệ thống hiển thị thông báo lỗi màu đỏ: "Ngày khởi hành không hợp lệ, vui lòng chọn ngày trong tương lai", mặc dù ngày hiện tại của hệ thống mới là 10/11/2026.
+
+Yêu cầu: Hiện tượng thông báo lỗi sai trên màn hình thuộc khái niệm nào trong ba khái niệm (Error, Defect, Failure)? Hãy đóng vai trò là người phân tích kỹ thuật, giả định và liệt kê ít nhất 2 chuỗi nguyên nhân (Error $\rightarrow$ Defect) khác nhau có thể đã dẫn đến hiện tượng trên (ví dụ: một chuỗi bắt nguồn từ lỗi của Lập trình viên viết code, và một chuỗi bắt nguồn từ lỗi của Quản trị viên hệ thống hoặc BA).
+
+**LỜI GIẢI CHI TIẾT**
+
+Hiện tượng màn hình hiển thị thông báo lỗi màu đỏ "Ngày khởi hành không hợp lệ, vui lòng chọn ngày trong tương lai" khi người dùng nhập ngày hợp lệ (20/11/2026 so với ngày hiện tại 10/11/2026) chính là một Failure (Sự cố vận hành). Đây là hành vi sai lệch quan sát được bên ngoài khi phần mềm đang được thực thi.
+
+Truy vết 2 chuỗi nguyên nhân (Error $\rightarrow$ Defect) có thể dẫn đến Failure trên:
+
+1. Chuỗi nguyên nhân 1 (Xuất phát từ Lập trình viên - Lỗi logic mã nguồn):
+- Error: Lập trình viên viết nhầm chiều của toán tử so sánh ngày tháng hoặc nhầm lẫn định dạng ngày/tháng (so sánh chuỗi ký tự theo chuẩn Mỹ MM/DD/YYYY thay vì chuẩn Việt Nam DD/MM/YYYY).
+- Defect: Trong hàm kiểm tra tính hợp lệ của ngày (Validation function), tồn tại đoạn mã sai: `if (departureDate > currentDate) { showError(); }` (nhầm dấu nhỏ hơn thành dấu lớn hơn).
+- Failure: Khi hệ thống chạy, ngày 20/11/2026 lớn hơn 10/11/2026 nên điều kiện sai bị kích hoạt và hiển thị thông báo lỗi.
+
+2. Chuỗi nguyên nhân 2 (Xuất phát từ Quản trị viên hệ thống - Lỗi cấu hình môi trường):
+- Error: Quản trị viên hệ thống (System Admin) thiết lập sai đồng hồ thời gian hoặc múi giờ trên máy chủ (Server) của môi trường kiểm thử/vận hành (ví dụ: chỉnh nhầm năm của máy chủ thành năm 2027).
+- Defect: Tham số cấu hình thời gian hệ thống (System Clock) trên máy chủ bị lưu sai giá trị là 10/11/2027. (Trong trường hợp này, mã nguồn của lập trình viên hoàn toàn chính xác).
+- Failure: Khi ứng dụng chạy, nó lấy ngày 20/11/2026 của người dùng so sánh với ngày 10/11/2027 của máy chủ, thấy nhỏ hơn nên báo lỗi ngày trong quá khứ.
+
+#### Phân tích các tình huống biên và ngoại lệ đặc biệt
+
+1. Tình huống 1: Một lập trình viên viết một hàm xử lý ngoại lệ (Exception Handling) để dự phòng trường hợp máy chủ cơ sở dữ liệu bị ngắt kết nối đột ngột. Trong hàm này, lập trình viên đã viết sai cú pháp câu lệnh ghi nhật ký lỗi (Log), khiến chương trình sẽ bị sập (Crash) nếu hàm này được gọi. Tuy nhiên, suốt 3 năm vận hành, máy chủ cơ sở dữ liệu hoạt động hoàn hảo và chưa bao giờ bị ngắt kết nối nên hàm này chưa từng được thực thi lần nào. Trong phần mềm này có tồn tại Defect không? Có xảy ra Failure nào liên quan đến đoạn code trên không? Giải thích tại sao.
+2. Tình huống 2: Một ứng dụng dự báo thời tiết hoạt động hoàn toàn chính xác trên mọi thiết bị. Mã nguồn không có bất kỳ khiếm khuyết nào, tài liệu đặc tả cũng hoàn toàn chuẩn xác. Tuy nhiên, vào lúc 14:00 chiều, một sự cố đứt cáp quang biển kết hợp với mất điện tại trung tâm dữ liệu khiến ứng dụng trên điện thoại người dùng xoay vòng liên tục và báo "Không thể tải dữ liệu thời tiết". Hiện tượng ứng dụng không tải được dữ liệu trên màn hình người dùng có được coi là một Failure hay không? Nó có bắt nguồn từ một Defect trong phần mềm hay không?
+3. Tình huống 3: Trong quá trình tự kiểm thử cục bộ (Unit Test) trên máy cá nhân trước khi nộp code lên hệ thống chung, lập trình viên phát hiện mình viết sai công thức tính thuế VAT (viết nhầm 8% thành 10%). Lập trình viên lập tức sửa lại thành 8% trước khi đóng gói sản phẩm bàn giao cho đội ngũ Kiểm thử (Tester). Sai sót viết nhầm 8% thành 10% lúc đầu của lập trình viên được gọi là gì? Việc lập trình viên tự sửa ngay tại chỗ có ý nghĩa như thế nào đối với chi phí chất lượng phần mềm?
+
+**LỜI GIẢI CHI TIẾT**
+
+1. Trong phần mềm này CÓ tồn tại Defect, nhưng CHƯA từng xảy ra Failure liên quan đến đoạn code đó. Câu lệnh ghi nhật ký lỗi bị sai cú pháp là một Defect có thật đang nằm trong mã nguồn (do Error của lập trình viên khi gõ phím). Tuy nhiên Failure chỉ xảy ra khi phần mềm được thực thi và luồng chạy đi qua đúng vị trí chứa Defect. Vì điều kiện kích hoạt hàm xử lý ngoại lệ (máy chủ cơ sở dữ liệu ngắt kết nối) chưa bao giờ xảy ra trong 3 năm, đoạn mã lỗi chưa từng được CPU thực thi nên chưa biểu hiện thành Failure. Đây cũng là cơ sở cho Nguyên lý kiểm thử số 7 (Absence-of-errors fallacy - Ngụy biện về việc không có lỗi): Việc phần mềm chạy mượt mà và không biểu hiện lỗi trong quá trình vận hành không đồng nghĩa với việc mã nguồn bên trong nó sạch bóng hoàn toàn các khiếm khuyết.
+2. Hiện tượng ứng dụng không tải được dữ liệu trên màn hình người dùng ĐƯỢC COI là một Failure (dưới góc nhìn trải nghiệm dịch vụ của người dùng cuối), nhưng nó KHÔNG bắt nguồn từ một Defect trong mã nguồn hay tài liệu của phần mềm đó. Không phải mọi Failure đều do Defect trong phần mềm gây ra. Các yếu tố tác động từ môi trường bên ngoài — chẳng hạn như sự cố hạ tầng mạng (đứt cáp quang), mất điện trung tâm dữ liệu, hỏng hóc phần cứng vật lý, bức xạ điện từ hoặc lỗi từ hệ thống bên thứ ba — cũng có thể làm phần mềm ngừng hoạt động hoặc trả về kết quả sai lệch so với mong đợi của người dùng, tạo ra một Failure về mặt vận hành.
+3. Sai sót viết nhầm 8% thành 10% lúc đầu của lập trình viên vẫn được gọi là một Error (và đoạn mã sai lúc chưa sửa là một Defect tồn tại tạm thời trong quá trình phát triển). Việc lập trình viên tự phát hiện và sửa lỗi ngay trong giai đoạn viết code/kiểm thử đơn vị (Unit Test) có ý nghĩa cực kỳ lớn trong việc tối ưu hóa chi phí phát triển phần mềm. Theo quy luật kinh tế học trong kiểm thử (tương ứng với nguyên lý Early Testing - Kiểm thử sớm), chi phí để sửa một lỗi ngay tại thời điểm lập trình viên vừa gõ xong code gần như bằng 0 (chỉ mất vài giây sửa lại số 10 thành số 8). Nếu lỗi này lọt qua giai đoạn kiểm thử tích hợp, kiểm thử hệ thống và đến tay khách hàng mới phát hiện ra, chi phí để lập báo cáo lỗi, họp phân tích, sửa code, kiểm thử lại toàn bộ hệ thống (Regression Testing), phát hành bản vá và bồi thường chênh lệch thuế cho khách hàng sẽ tăng lên gấp hàng chục, thậm chí hàng trăm lần.
+
+#### Điền khuyết thuật ngữ vào báo cáo chất lượng
+
+Bạn hãy chọn một trong các từ khóa: [Error], [Defect], [Failure] để điền vào các chỗ trống (1) đến (6) trong đoạn văn bản mô tả quy trình phát sinh lỗi dưới đây sao cho chính xác nhất về mặt học thuật:
+
+"Trong một dự án phần mềm, áp lực về mặt thời gian thường khiến đội ngũ phát triển dễ mắc phải các (1) trong quá trình suy nghĩ và thao tác. Khi một lập trình viên hoặc chuyên viên phân tích nghiệp vụ mắc (2), họ sẽ vô tình tạo ra một hoặc nhiều (3) nằm ẩn bên trong mã nguồn hoặc tài liệu đặc tả. Những (4) này có thể nằm im lìm trong suốt một thời gian dài mà không ai hay biết. Chỉ đến khi phần mềm được thực thi và người dùng vô tình kích hoạt đúng vào luồng xử lý chứa (5) đó, hệ thống mới biểu hiện ra hành vi sai lệch so với mong đợi — lúc này, một (6) đã chính thức xảy ra."
+
+**LỜI GIẢI CHI TIẾT**
+
+Thứ tự các thuật ngữ chính xác cần điền vào đoạn văn là:
+
+1. Error (hoặc Errors)
+2. Error
+3. Defect (hoặc Defects)
+4. Defect (hoặc Defects)
+5. Defect
+6. Failure
+
+::: info NOTE
+Con người làm ra $\rightarrow$ Error (Mistake).
+
+Tài liệu/Mã nguồn chứa $\rightarrow$ Defect (Bug/Fault).
+
+Phần mềm khi chạy bộc lộ ra $\rightarrow$ Failure.
+:::
 
 # Test Design Techniques
 

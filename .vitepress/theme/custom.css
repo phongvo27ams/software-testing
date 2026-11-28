@@ -367,10 +367,11 @@ html {
   color: #000000;
 }
 
-/* Đoạn văn dễ đọc (1rem = 16px) */
+/* Đoạn văn dễ đọc (1rem = 18px) và căn đều hai bên như sách in */
 .vp-doc p {
   line-height: 1.75;
   font-size: 1rem;
+  text-align: justify;
 }
 
 /* Danh sách liền mạch: bullet dời trái nhẹ để ngang hàng số thứ tự, text vẫn thẳng hàng tuyệt đối (2.15rem) */
@@ -389,6 +390,7 @@ html {
 .vp-doc li {
   line-height: 1.62;
   font-size: 1rem;
+  text-align: justify;
 }
 
 .vp-doc ul > li {
