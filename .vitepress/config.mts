@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'vitepress'
+import { katex } from '@mdit/plugin-katex'
 
 export default defineConfig({
   base: process.env.GITHUB_ACTIONS ? '/software-testing/' : '/',
@@ -57,8 +58,6 @@ export default defineConfig({
   ],
 
   markdown: {
-    // Bật hỗ trợ biểu thức toán học LaTeX ($...$ và $$...$$)
-    math: true,
     // Hiển thị số dòng cho code block
     lineNumbers: true,
     // Theme code highlighting sáng đẹp mắt
@@ -67,6 +66,9 @@ export default defineConfig({
       dark: 'github-dark'
     },
     config(md) {
+      // Dùng KaTeX thay MathJax3 (SVG) để có thể bôi đen và copy công thức toán như text thường
+      md.use(katex)
+
       const defaultFence = md.renderer.rules.fence!
       md.renderer.rules.fence = (tokens, idx, options, env, self) => {
         const token = tokens[idx]

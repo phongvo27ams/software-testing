@@ -439,13 +439,15 @@ html {
   overflow-wrap: anywhere;
 }
 
-/* Biểu thức toán học (MathJax) đồng bộ 1rem và căn giữa đẹp mắt */
-.vp-doc mjx-container {
+/* Biểu thức toán học (KaTeX) đồng bộ 1rem, cho phép chọn & copy như text thường */
+.vp-doc .katex {
   font-size: 1rem !important;
+  user-select: text;
 }
 
-.vp-doc mjx-container[display='true'] {
+.vp-doc .katex-display {
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 0.75rem 0;
   margin: 1rem 0;
 }

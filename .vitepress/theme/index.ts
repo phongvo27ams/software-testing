@@ -1,6 +1,7 @@
 import DefaultTheme from 'vitepress/theme'
 import Layout from './Layout.vue'
 import Mermaid from './Mermaid.vue'
+import 'katex/dist/katex.min.css'
 import './custom.css'
 
 export default {
