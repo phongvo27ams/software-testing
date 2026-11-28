@@ -120,6 +120,44 @@ Lập luận phản biện dựa trên Tâm lý học trong kiểm thử (Psycho
 
 Việc lập trình viên cẩn thận và thực hiện Unit Test kỹ lưỡng là điều vô cùng đáng quý, giúp đảm bảo chất lượng mã nguồn ngay từ cấp độ thành phần. Tuy nhiên, điều đó không thể thay thế hoàn toàn vai trò của đội ngũ Kiểm thử viên (Tester) độc lập. Về mặt tâm lý học, con người luôn tồn tại "thiên kiến xác nhận" — khi tự kiểm tra mã nguồn của chính mình, lập trình viên thường có xu hướng kiểm thử theo đúng những luồng logic mà họ đã lập trình, dẫn đến việc vô tình bỏ qua các trường hợp ngoại lệ hoặc các lỗ hổng phát sinh từ sự hiểu sai yêu cầu nghiệp vụ ban đầu. Hơn nữa, Unit Test chỉ kiểm tra từng hàm hoặc từng mô-đun riêng lẻ một cách cô lập, trong khi phần lớn các lỗi nghiêm trọng lại xuất hiện khi các mô-đun tích hợp với nhau hoặc dưới góc nhìn trải nghiệm tổng thể của người dùng cuối. Sự tham gia của Kiểm thử viên độc lập với góc nhìn khách quan, tư duy phản biện và không bị chi phối bởi giả định của người viết code chính là chốt chặn an toàn cần thiết để đảm bảo sản phẩm thực sự hoàn thiện trước khi đến tay khách hàng.
 
+### Error, Defect (Bug), and Failure
+
+#### Phân tách chuỗi nhân quả từ tình huống thực tế
+
+Bối cảnh 1 (Lĩnh vực Thương mại điện tử): Trong quá trình lập trình chức năng tính phí vận chuyển cho một ứng dụng giao hàng, lập trình viên A làm việc liên tục đến 2 giờ sáng nên bị mất tập trung. Theo tài liệu đặc tả yêu cầu: "Miễn phí vận chuyển cho các đơn hàng có tổng giá trị từ 500.000 VNĐ trở lên (tức là $\ge 500.000$)". Tuy nhiên, lập trình viên A đã gõ nhầm toán tử so sánh trong câu lệnh điều kiện thành `if (orderTotal > 500000)` thay vì `if (orderTotal >= 500000)`. Một tuần sau, khách hàng B đặt một đơn hàng có giá trị đúng bằng 500.000 VNĐ. Khi chuyển sang bước thanh toán, màn hình hiển thị phí vận chuyển là 30.000 VNĐ thay vì 0 VNĐ như chính sách đã công bố.
+
+Bối cảnh 2 (Lĩnh vực Ngân hàng/Tài chính): Khi viết tài liệu đặc tả yêu cầu (SRS) cho tính năng gửi tiết kiệm trực tuyến, Chuyên viên phân tích nghiệp vụ (BA) hiểu nhầm quy định của Ngân hàng Nhà nước nên đã viết rằng: "Lãi suất tiền gửi kỳ hạn 1 tháng là 45%/năm" (thay vì con số thực tế là 4.5%/năm). Lập trình viên đọc tài liệu SRS và viết công thức tính lãi suất chính xác theo con số 45% trong tài liệu. Khi ứng dụng được đưa lên môi trường kiểm thử (Staging), Kiểm thử viên thực hiện giao dịch gửi 100 triệu đồng kỳ hạn 1 tháng và thấy hệ thống tính tiền lãi lên tới 3.750.000 VNĐ/tháng.
+
+Yêu cầu: Với mỗi bối cảnh trên, bạn hãy xác định và chỉ rõ đâu là Error, đâu là Defect (Bug) và đâu là Failure.
+
+**LỜI GIẢI CHI TIẾT**
+
+::: info NOTE
+Error/Mistake (Sai sót của con người): Là hành động sai lầm của con người (lập trình viên, chuyên viên phân tích nghiệp vụ BA, người thiết kế...) tạo ra một kết quả không chính xác. Nguyên nhân có thể do thiếu kinh nghiệm, áp lực tiến độ, mệt mỏi, giao tiếp hiểu lầm hoặc kiến thức nghiệp vụ chưa vững.
+
+Defect/Bug/Fault (Khiếm khuyết trong sản phẩm): Là hệ quả trực tiếp từ Error của con người, tồn tại dưới dạng một đoạn mã nguồn sai, một cấu hình sai hoặc một dòng mô tả sai nằm bên trong các sản phẩm công việc (tài liệu đặc tả SRS, bản thiết kế, mã nguồn...). Khi phần mềm chưa chạy, Defect nằm im ở trạng thái tĩnh.
+
+Failure (Sự cố vận hành): Là biểu hiện sai lệch của phần mềm so với kết quả mong đợi khi chương trình được thực thi (chạy) và kích hoạt trúng vào vị trí có chứa Defect. (Lưu ý: Không phải mọi Defect đều dẫn đến Failure, và một Failure cũng có thể xuất phát từ yếu tố môi trường như bức xạ, từ trường, hỏng phần cứng chứ không nhất thiết do Defect trong code).
+:::
+
+Bối cảnh 1 (Lĩnh vực Thương mại điện tử):
+
+- Error (Sai sót của con người): Hành động mất tập trung do làm việc khuya của lập trình viên A dẫn đến việc nhầm lẫn giữa khái niệm "từ 500.000 VNĐ trở lên" ($\ge$) với "lớn hơn 500.000 VNĐ" ($>$) trong quá trình viết mã nguồn.
+- Defect/Bug (Khiếm khuyết trong sản phẩm): Dòng mã nguồn sai lệch nằm trong tệp xử lý tính phí vận chuyển: `if (orderTotal > 500000)`. Khi phần mềm chưa được chạy, dòng mã này tồn tại ở trạng thái tĩnh như một lỗi tiềm ẩn bên trong mã nguồn
+- Failure (Sự cố vận hành): Hiện tượng thực tế xảy ra khi khách hàng B chạy ứng dụng, đặt đơn hàng đúng bằng 500.000 VNĐ và màn hình thanh toán hiển thị sai phí vận chuyển là 30.000 VNĐ thay vì kết quả mong đợi là 0 VNĐ.
+
+Đây là chuỗi nhân quả kinh điển nhất trong kỹ thuật phần mềm: Error $\rightarrow$ Defect $\rightarrow$ Failure. Lưu ý rằng khi khách hàng khác đặt đơn hàng 600.000 VNĐ hoặc 200.000 VNĐ, phần mềm vẫn hiển thị đúng phí vận chuyển mặc dù Defect vẫn nằm trong mã nguồn. Failure chỉ xuất hiện khi dữ liệu đầu vào (giá trị biên 500.000 VNĐ) kích hoạt đúng vào điều kiện bị sai lệch.
+
+Bối cảnh 2 (Lĩnh vực Ngân hàng/Tài chính):
+
+- Error (Sai sót của con người): Sự hiểu nhầm quy định nghiệp vụ của Chuyên viên phân tích nghiệp vụ (BA) khi đọc thông tin lãi suất (nhầm lẫn giữa 4.5% và 45%). (Lưu ý: Trong tình huống này, lập trình viên KHÔNG mắc Error vì họ đã làm đúng theo tài liệu được giao).
+- Defect/Bug (Khiếm khuyết trong sản phẩm):
+  - Defect gốc (tại giai đoạn phân tích): Dòng mô tả sai "Lãi suất tiền gửi kỳ hạn 1 tháng là 45%/năm" nằm trong tài liệu đặc tả yêu cầu (SRS).
+  - Defect kế thừa (tại giai đoạn lập trình): Công thức tính lãi suất interest = principal * 0.45 / 12 nằm trong mã nguồn của lập trình viên (được tạo ra do sao chép sai sót từ tài liệu SRS).
+- Failure (Sự cố vận hành): Khi kiểm thử viên thực thi giao dịch gửi 100 triệu đồng trên môi trường Staging, hệ thống hiển thị số tiền lãi sai lệch là 3.750.000 VNĐ (thay vì kết quả đúng theo nghiệp vụ ngân hàng là 375.000 VNĐ).
+
+Tình huống này chứng minh một nguyên lý quan trọng của ISTQB: Defect không chỉ tồn tại trong mã nguồn (Code), mà tồn tại trong mọi sản phẩm công việc (Work Products) của quy trình phát triển phần mềm — bao gồm tài liệu đặc tả yêu cầu (SRS), tài liệu thiết kế (Design), kịch bản kiểm thử (Test Cases) và hướng dẫn sử dụng. Việc thực hiện Kiểm thử tĩnh (Static Testing - rà soát tài liệu SRS) ngay từ đầu sẽ giúp phát hiện Defect này trước khi nó lây lan sang mã nguồn.
+
 # Test Design Techniques
 
 ## Black-box Testing Techniques

@@ -280,7 +280,7 @@ html {
 
 .vp-doc > div > h2::before {
   content: counter(h1) '.' counter(h2) ' ';
-  color: var(--vp-c-brand-1);
+  color: #047857;
   font-weight: 700;
   margin-right: 0.25rem;
 }
@@ -328,7 +328,7 @@ html {
 .vp-doc h2 {
   font-size: 1.6rem; /* 25.6px */
   line-height: 1.35;
-  color: var(--vp-c-brand-1);
+  color: #047857;
   margin-top: 2.75rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--vp-c-divider);
@@ -373,35 +373,42 @@ html {
   font-size: 1rem;
 }
 
-/* Danh sách liền mạch: bullet/number level 1 thẳng hàng với lề trái text, khoảng cách bullet-text rộng đều mọi cấp */
+/* Danh sách liền mạch: bullet dời trái nhẹ để ngang hàng số thứ tự, text vẫn thẳng hàng tuyệt đối (2.15rem) */
 .vp-doc ul {
   margin: 0.6rem 0 1rem;
-  padding-left: 1.25rem !important;
+  padding-left: 1.1rem !important;
   list-style-position: outside !important;
 }
 
 .vp-doc ol {
   margin: 0.6rem 0 1rem;
-  padding-left: 1.5rem !important;
+  padding-left: 1.4rem !important;
   list-style-position: outside !important;
 }
 
 .vp-doc li {
   line-height: 1.62;
   font-size: 1rem;
+}
+
+.vp-doc ul > li {
+  padding-left: 1.05rem !important;
+}
+
+.vp-doc ol > li {
   padding-left: 0.75rem !important;
 }
 
 .vp-doc li > ul {
   margin-top: 0.25rem;
   margin-bottom: 0.35rem;
-  padding-left: 1.25rem !important;
+  padding-left: 1.1rem !important;
 }
 
 .vp-doc li > ol {
   margin-top: 0.25rem;
   margin-bottom: 0.35rem;
-  padding-left: 1.5rem !important;
+  padding-left: 1.4rem !important;
 }
 
 /* Ký hiệu bullet phân biệt theo từng cấp 1, 2, 3, 4 */
